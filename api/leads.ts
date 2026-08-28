@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { hasCompleteAnswers, scoreQuiz } from '../src/lib/results'
-import type { QuizAnswers } from '../src/types'
+import { hasCompleteAnswers, scoreQuiz } from '../src/lib/results.js'
+import type { QuizAnswers } from '../src/types.js'
 
 type ApiRequest = IncomingMessage & { body?: unknown }
 

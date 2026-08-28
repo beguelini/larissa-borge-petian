@@ -1,5 +1,5 @@
-import { quizQuestions } from '../data/questions'
-import type { Dosha, DoshaScores, QuizAnswers, QuizResult } from '../types'
+import { quizQuestions } from '../data/questions.js'
+import type { Dosha, DoshaScores, QuizAnswers, QuizResult } from '../types.js'
 
 const doshaOrder: Dosha[] = ['vata', 'pitta', 'kapha']
 
