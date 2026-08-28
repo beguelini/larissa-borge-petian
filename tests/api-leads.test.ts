@@ -1,19 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import handler from '../api/leads'
+import { handleLeadPayload } from '../api/leads'
 import { quizQuestions } from '../src/data/questions'
 
 function completeAnswers() {
   return Object.fromEntries(
     quizQuestions.map((question) => [question.id, question.options[0].id]),
   )
-}
-
-function requestWith(body: Record<string, unknown>) {
-  return new Request('https://quiz.example.com/api/leads', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
 }
 
 afterEach(() => {
@@ -25,13 +17,13 @@ afterEach(() => {
 describe('POST /api/leads', () => {
   it('rejeita questionário adulterado antes de acessar o banco', async () => {
     const databaseFetch = vi.spyOn(globalThis, 'fetch')
-    const response = await handler.fetch(requestWith({
+    const response = await handleLeadPayload({
       firstName: 'Teste',
       email: 'qa@example.com',
       privacyConsent: true,
       marketingConsent: false,
       answers: { 'body-frame': 'opcao-inexistente' },
-    }))
+    })
 
     expect(response.status).toBe(422)
     expect(databaseFetch).not.toHaveBeenCalled()
@@ -42,14 +34,14 @@ describe('POST /api/leads', () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
     const databaseFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 201 }))
 
-    const response = await handler.fetch(requestWith({
+    const response = await handleLeadPayload({
       firstName: 'Teste',
       email: 'QA@Example.com',
       privacyConsent: true,
       marketingConsent: false,
       answers: completeAnswers(),
       source: { path: '/', utmCampaign: 'teste' },
-    }))
+    })
 
     expect(response.status).toBe(201)
     expect(databaseFetch).toHaveBeenCalledOnce()

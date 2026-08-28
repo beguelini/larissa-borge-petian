@@ -1,5 +1,8 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { hasCompleteAnswers, scoreQuiz } from '../src/lib/results'
 import type { QuizAnswers } from '../src/types'
+
+type ApiRequest = IncomingMessage & { body?: unknown }
 
 type LeadPayload = {
   firstName?: unknown
@@ -11,14 +14,15 @@ type LeadPayload = {
   source?: unknown
 }
 
+type LeadResponse = {
+  status: number
+  body: Record<string, unknown>
+}
+
 const responseHeaders = {
   'Cache-Control': 'no-store',
   'Content-Type': 'application/json; charset=utf-8',
   'X-Content-Type-Options': 'nosniff',
-}
-
-function json(body: Record<string, unknown>, status: number) {
-  return new Response(JSON.stringify(body), { status, headers: responseHeaders })
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,43 +53,49 @@ function cleanSource(value: unknown) {
   }, {})
 }
 
-async function handlePost(request: Request) {
-  const contentLength = Number(request.headers.get('content-length') ?? 0)
-  if (contentLength > 50_000) return json({ error: 'Payload muito grande.' }, 413)
+async function readBody(request: ApiRequest) {
+  if (request.body !== undefined) return request.body
 
-  const origin = request.headers.get('origin')
-  if (origin && new URL(origin).host !== new URL(request.url).host) {
-    return json({ error: 'Origem não autorizada.' }, 403)
+  const chunks: Buffer[] = []
+  for await (const chunk of request) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
   }
+  return JSON.parse(Buffer.concat(chunks).toString('utf8')) as unknown
+}
 
-  let body: LeadPayload
-  try {
-    body = await request.json() as LeadPayload
-  } catch {
-    return json({ error: 'Dados inválidos.' }, 400)
-  }
+function send(response: ServerResponse, result: LeadResponse, extraHeaders: Record<string, string> = {}) {
+  response.statusCode = result.status
+  Object.entries({ ...responseHeaders, ...extraHeaders }).forEach(([name, value]) => {
+    response.setHeader(name, value)
+  })
+  response.end(JSON.stringify(result.body))
+}
 
-  if (typeof body.website === 'string' && body.website.trim()) {
-    return json({ ok: true }, 201)
+export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
+  if (!isRecord(body)) return { status: 400, body: { error: 'Dados inválidos.' } }
+  const payload = body as LeadPayload
+
+  if (typeof payload.website === 'string' && payload.website.trim()) {
+    return { status: 201, body: { ok: true } }
   }
-  if (!validName(body.firstName) || !validEmail(body.email)) {
-    return json({ error: 'Nome ou e-mail inválido.' }, 422)
+  if (!validName(payload.firstName) || !validEmail(payload.email)) {
+    return { status: 422, body: { error: 'Nome ou e-mail inválido.' } }
   }
-  if (body.privacyConsent !== true || typeof body.marketingConsent !== 'boolean') {
-    return json({ error: 'Consentimentos inválidos.' }, 422)
+  if (payload.privacyConsent !== true || typeof payload.marketingConsent !== 'boolean') {
+    return { status: 422, body: { error: 'Consentimentos inválidos.' } }
   }
-  if (!isRecord(body.answers) || !hasCompleteAnswers(body.answers as QuizAnswers)) {
-    return json({ error: 'Questionário incompleto ou adulterado.' }, 422)
+  if (!isRecord(payload.answers) || !hasCompleteAnswers(payload.answers as QuizAnswers)) {
+    return { status: 422, body: { error: 'Questionário incompleto ou adulterado.' } }
   }
 
   const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '')
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('Supabase server environment is not configured')
-    return json({ error: 'Serviço temporariamente indisponível.' }, 503)
+    return { status: 503, body: { error: 'Serviço temporariamente indisponível.' } }
   }
 
-  const answers = body.answers as QuizAnswers
+  const answers = payload.answers as QuizAnswers
   const result = scoreQuiz(answers)
   const insertResponse = await fetch(`${supabaseUrl}/rest/v1/dosha_quiz_leads`, {
     method: 'POST',
@@ -96,36 +106,49 @@ async function handlePost(request: Request) {
       Prefer: 'return=minimal',
     },
     body: JSON.stringify({
-      first_name: body.firstName.trim(),
-      email: body.email.trim().toLowerCase(),
+      first_name: payload.firstName.trim(),
+      email: payload.email.trim().toLowerCase(),
       privacy_consent: true,
-      marketing_consent: body.marketingConsent,
+      marketing_consent: payload.marketingConsent,
       dominant_dosha: result.primary,
       secondary_dosha: result.secondary,
       is_balanced: result.isBalanced,
       scores: result.scores,
       answers,
-      source: cleanSource(body.source),
+      source: cleanSource(payload.source),
     }),
   })
 
   if (!insertResponse.ok) {
     console.error('Supabase lead insert failed', insertResponse.status)
-    return json({ error: 'Não foi possível registrar o resultado.' }, 502)
+    return { status: 502, body: { error: 'Não foi possível registrar o resultado.' } }
   }
 
-  return json({ ok: true }, 201)
+  return { status: 201, body: { ok: true } }
 }
 
-export default {
-  async fetch(request: Request) {
-    if (request.method !== 'POST') {
-      return new Response(JSON.stringify({ error: 'Método não permitido.' }), {
-        status: 405,
-        headers: { ...responseHeaders, Allow: 'POST' },
-      })
-    }
+export default async function handler(request: ApiRequest, response: ServerResponse) {
+  if (request.method !== 'POST') {
+    send(response, { status: 405, body: { error: 'Método não permitido.' } }, { Allow: 'POST' })
+    return
+  }
 
-    return handlePost(request)
-  },
+  const contentLength = Number(request.headers['content-length'] ?? 0)
+  if (contentLength > 50_000) {
+    send(response, { status: 413, body: { error: 'Payload muito grande.' } })
+    return
+  }
+
+  const origin = request.headers.origin
+  const host = request.headers.host
+  if (typeof origin === 'string' && host && new URL(origin).host !== host) {
+    send(response, { status: 403, body: { error: 'Origem não autorizada.' } })
+    return
+  }
+
+  try {
+    send(response, await handleLeadPayload(await readBody(request)))
+  } catch {
+    send(response, { status: 400, body: { error: 'Dados inválidos.' } })
+  }
 }
