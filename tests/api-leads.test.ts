@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import handler from './leads'
+import handler from '../api/leads'
 import { quizQuestions } from '../src/data/questions'
 
 function completeAnswers() {
