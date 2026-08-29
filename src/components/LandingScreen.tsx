@@ -1,5 +1,4 @@
 import { ArrowRight, ClipboardCheck } from 'lucide-react'
-import { Brand } from './Brand'
 import { BotanicalRhythm, BotanicalSprig } from './Illustrations'
 
 type LandingScreenProps = {
@@ -9,10 +8,6 @@ type LandingScreenProps = {
 export function LandingScreen({ onStart }: LandingScreenProps) {
   return (
     <div className="landing-screen">
-      <header className="site-header shell">
-        <Brand />
-      </header>
-
       <section className="hero shell">
         <div className="hero-copy">
           <h1>Descubra o que o seu corpo vem tentando dizer</h1>
