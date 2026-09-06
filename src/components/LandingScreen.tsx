@@ -1,4 +1,4 @@
-import { ArrowRight, ClipboardCheck } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, ClipboardCheck } from 'lucide-react'
 import { BotanicalRhythm, BotanicalSprig } from './Illustrations'
 import { FooterLogo } from './FooterLogo'
 
@@ -38,9 +38,10 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
       </section>
 
       <section className="home-editorial" aria-label="Conheça o Ayurveda">
-        <figure className="home-editorial-frame">
+        <button className="home-editorial-frame" type="button" onClick={onStart}>
           <img src="/ads-teste-dosha-gratuito-v2.png" alt="Material introdutório: você já cuida do seu bem-estar, agora conheça o Ayurveda." />
-        </figure>
+          <span>Iniciar questionário <ArrowUpRight aria-hidden="true" size={19} /></span>
+        </button>
       </section>
 
       <section className="gentle-path">

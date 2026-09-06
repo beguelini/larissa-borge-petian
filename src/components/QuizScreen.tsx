@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Check, ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { QuizQuestion } from '../types'
 import { FooterLogo } from './FooterLogo'
@@ -46,11 +46,11 @@ export function QuizScreen({
   return (
     <div className="app-screen quiz-screen">
       <header className="app-header app-header-actions shell">
-        <button className="text-button" type="button" onClick={onExit}>Sair</button>
+        <button className="quiz-close" type="button" aria-label="Sair do questionário" onClick={onExit}><X aria-hidden="true" size={20} /></button>
       </header>
 
       <div className="quiz-progress shell">
-        <span>{questionIndex + 1} de {totalQuestions}</span>
+        <span>Pergunta {questionIndex + 1} de {totalQuestions}</span>
         <div className="progress-track" aria-hidden="true">
           <div className="progress-value" style={{ width: `${progress}%` }} />
         </div>
@@ -74,7 +74,7 @@ export function QuizScreen({
                 onClick={() => choose(option.id)}
               >
                 <span>{option.label}</span>
-                <ChevronRight aria-hidden="true" size={22} strokeWidth={1.8} />
+                {selected ? <Check aria-hidden="true" size={21} strokeWidth={2.1} /> : <ChevronRight aria-hidden="true" size={22} strokeWidth={1.8} />}
               </button>
             )
           })}
