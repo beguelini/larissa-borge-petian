@@ -50,8 +50,10 @@ export function summarizeLeads(leads: LeadSummary[], now = new Date()) {
   })
 
   const total = leads.length
-  const dominantDosha = (Object.entries(doshas) as [Dosha, number][])
-    .sort(([firstDosha, firstCount], [secondDosha, secondCount]) => secondCount - firstCount || firstDosha.localeCompare(secondDosha))[0]?.[0] ?? null
+  const dominantDosha = total
+    ? (['vata', 'pitta', 'kapha'] as Dosha[])
+      .sort((firstDosha, secondDosha) => doshas[secondDosha] - doshas[firstDosha])[0]
+    : null
 
   return {
     total,
