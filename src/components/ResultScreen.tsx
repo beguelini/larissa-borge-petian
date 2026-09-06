@@ -52,7 +52,7 @@ const resultContent: Record<Dosha, { support: string; insights: string[]; ritual
   },
 }
 
-const productUrl = import.meta.env.VITE_PRODUCT_CTA_URL || 'https://www.instagram.com/larissaborgepetian/'
+const prelaunchWhatsAppUrl = 'https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t'
 
 function ScoreRings({ result }: { result: QuizResult }) {
   const rings: { dosha: Dosha; radius: number; color: string }[] = [
@@ -168,10 +168,16 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
             <span><Users aria-hidden="true" /> Encontro fechado</span>
           </div>
           <div className="product-action">
-            <p>Turma fundadora <span>•</span> <strong>R$197</strong></p>
-            <a className="product-button" href={productUrl}>Quero voltar ao meu ritmo</a>
-            <a className="product-link" href={productUrl}>Conhecer o programa</a>
-            <small>Acesso por 12 meses + canal de suporte</small>
+            <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo</strong></p>
+            <a
+              className="product-button"
+              href={prelaunchWhatsAppUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Entrar no grupo do WhatsApp
+            </a>
+            <small>Receba as novidades e os próximos passos do lançamento.</small>
           </div>
         </div>
       </section>

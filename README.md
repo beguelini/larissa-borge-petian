@@ -33,9 +33,6 @@ Copie `.env.example` apenas como referência. Na Vercel, configure:
 
 - `SUPABASE_URL`: URL do projeto Supabase, somente no servidor.
 - `SUPABASE_SERVICE_ROLE_KEY`: service role, somente no servidor. Nunca use prefixo `VITE_`.
-- `VITE_PRODUCT_CTA_URL`: URL pública do checkout ou lista de espera do Ritmo Essencial.
-
-Sem `VITE_PRODUCT_CTA_URL`, o CTA usa o Instagram `@larissaborgepetian` como destino temporário.
 
 ## Banco de dados
 
@@ -49,9 +46,13 @@ npx supabase db push
 npx supabase test db
 ```
 
+## Painel de interesse
+
+O painel em `/painel` consolida cadastros, consentimento de marketing, distribuição de doshas e a evolução diária. Ele consulta apenas dados agregados através da Function `/api/analytics`; nomes e e-mails não são retornados ao navegador.
+
 ## Privacidade e conteúdo
 
 - O consentimento necessário para liberar o resultado é separado do consentimento opcional de marketing.
 - O questionário é uma leitura educativa de autoconhecimento, não diagnóstico ou orientação de saúde.
 - A Política de Privacidade já descreve dados, finalidade, operadores e direitos, mas o contato provisório pelo Instagram deve ser substituído pelo e-mail oficial da Larissa antes da campanha.
-- O CTA do produto deve receber a URL real de checkout ou lista de espera antes da publicação definitiva.
+- Ao final do resultado, a pessoa pode entrar no grupo de WhatsApp do pré-lançamento.
