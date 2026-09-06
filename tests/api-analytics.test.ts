@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { summarizeLeads } from '../api/analytics'
 
 describe('GET /api/analytics', () => {
+  it('não infere um dosha predominante sem cadastros', () => {
+    expect(summarizeLeads([], new Date('2026-09-06T16:00:00.000Z')).dominantDosha).toBeNull()
+  })
+
   it('consolida somente dados agregados dos leads', () => {
     const result = summarizeLeads([
       { dominant_dosha: 'pitta', is_balanced: false, marketing_consent: true, created_at: '2026-09-06T12:00:00.000Z' },
