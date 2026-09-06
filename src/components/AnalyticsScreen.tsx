@@ -5,6 +5,7 @@ import {
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Dosha } from '../types'
 import { DashboardSidebar } from './DashboardSidebar'
+import { FooterLogo } from './FooterLogo'
 
 type RecentLead = { initials: string; timeLabel: string; dosha: Dosha }
 type DayRegistration = { date: string; count: number }
@@ -72,7 +73,7 @@ export function AnalyticsScreen() {
         <div className="reference-card reference-chart-card"><h2>Cadastros por dia</h2>{data.registrationsByDay.length ? <RegistrationChart graph={graph} maxDaily={maxDaily} days={data.registrationsByDay} /> : <p className="reference-empty">Os pontos diários aparecerão com os primeiros cadastros.</p>}</div>
         <div className="reference-card reference-recent-card"><h2>Cadastros recentes</h2>{data.recentLeads.length ? <div className="reference-recent-list">{data.recentLeads.map((lead, index) => <div className="reference-recent-row" key={`${lead.initials}-${index}`}><span className={`reference-initials ${doshaClass[lead.dosha]}`}>{lead.initials}</span><span>{lead.timeLabel}</span><strong className={doshaClass[lead.dosha]}><i />{doshaLabel[lead.dosha]}</strong></div>)}</div> : <p className="reference-empty">Os novos cadastros aparecerão aqui.</p>}<button className="reference-see-all" type="button" onClick={loadAnalytics} disabled={loading}>{loading ? <RefreshCw className="is-spinning" size={16} /> : <>Ver todos <ChevronRight aria-hidden="true" size={18} /></>}</button></div>
       </section>
-    </>}
+    </>}<FooterLogo className="reference-footer" />
   </main></div>
 }
 

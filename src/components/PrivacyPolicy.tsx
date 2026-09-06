@@ -1,4 +1,5 @@
 import { X } from 'lucide-react'
+import { FooterLogo } from './FooterLogo'
 
 type PrivacyPolicyProps = {
   onClose: () => void
@@ -37,6 +38,7 @@ export function PrivacyPolicy({ onClose }: PrivacyPolicyProps) {
 
         <p className="privacy-disclaimer">O questionário é educativo e não substitui avaliação ou orientação de profissional de saúde.</p>
         <button className="primary-button" type="button" onClick={onClose}>Entendi</button>
+        <FooterLogo className="privacy-footer" />
       </section>
     </div>
   )

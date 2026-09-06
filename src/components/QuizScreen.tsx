@@ -1,7 +1,7 @@
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { QuizQuestion } from '../types'
-import { Brand } from './Brand'
+import { FooterLogo } from './FooterLogo'
 
 type QuizScreenProps = {
   question: QuizQuestion
@@ -45,8 +45,7 @@ export function QuizScreen({
 
   return (
     <div className="app-screen quiz-screen">
-      <header className="app-header shell">
-        <Brand />
+      <header className="app-header app-header-actions shell">
         <button className="text-button" type="button" onClick={onExit}>Sair</button>
       </header>
 
@@ -86,6 +85,7 @@ export function QuizScreen({
           Voltar
         </button>
       </section>
+      <FooterLogo />
     </div>
   )
 }

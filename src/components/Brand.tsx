@@ -1,3 +1,5 @@
+import { FooterLogo } from './FooterLogo'
+
 export function Brand() {
-  return <span className="brand">Larissa Petian</span>
+  return <FooterLogo />
 }
