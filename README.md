@@ -33,6 +33,8 @@ Copie `.env.example` apenas como referência. Na Vercel, configure:
 
 - `SUPABASE_URL`: URL do projeto Supabase, somente no servidor.
 - `SUPABASE_SERVICE_ROLE_KEY`: service role, somente no servidor. Nunca use prefixo `VITE_`.
+- `DASHBOARD_PASSWORD`: senha de acesso ao painel administrativo.
+- `DASHBOARD_SESSION_SECRET`: segredo aleatório de pelo menos 32 caracteres usado para assinar a sessão do painel.
 
 ## Banco de dados
 
@@ -48,7 +50,7 @@ npx supabase test db
 
 ## Painel de interesse
 
-O painel em `/painel` consolida cadastros, consentimento de marketing, distribuição de doshas e a evolução diária. Ele consulta apenas dados agregados através da Function `/api/analytics`; nomes e e-mails não são retornados ao navegador.
+O painel em `/painel` e a lista em `/cadastros` exigem login em `/login`. A sessão é HTTP-only, assinada no servidor e válida por oito horas. Após autenticação, a tela de cadastros apresenta nome, e-mail, resultado e consentimento; essas informações nunca são retornadas por APIs sem sessão válida.
 
 ## Privacidade e conteúdo
 

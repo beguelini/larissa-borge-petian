@@ -1,4 +1,4 @@
-import { BarChart3, Home, Leaf, LineChart, Settings, Users } from 'lucide-react'
+import { BarChart3, Home, Leaf, LineChart, LogOut, Settings, Users } from 'lucide-react'
 import { BotanicalSprig } from './Illustrations'
 
 type DashboardSection = 'panel' | 'registrations'
@@ -12,6 +12,11 @@ export function DashboardSidebar({ active }: { active: DashboardSection }) {
     { label: 'Configurações', icon: Settings, href: '#configuracoes', id: 'settings' },
   ]
 
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    window.location.assign('/login')
+  }
+
   return (
     <aside className="reference-sidebar" aria-label="Navegação do painel">
       <a className="reference-mark" href="/" aria-label="Voltar ao quiz"><Leaf size={43} strokeWidth={1.35} /></a>
@@ -23,6 +28,7 @@ export function DashboardSidebar({ active }: { active: DashboardSection }) {
         ))}
       </nav>
       <div className="reference-sidebar-rule" />
+      <button className="reference-logout" type="button" onClick={() => void logout()}><LogOut aria-hidden="true" size={19} strokeWidth={1.5} /> Sair</button>
       <BotanicalSprig className="reference-sidebar-sprig" />
     </aside>
   )

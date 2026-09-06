@@ -1,7 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { requireDashboardSession } from './_lib/dashboard-auth'
 
 type Dosha = 'vata' | 'pitta' | 'kapha'
-type LeadRecord = { first_name: string; dominant_dosha: Dosha; marketing_consent: boolean; created_at: string }
+type LeadRecord = { first_name: string; email: string; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }
 
 const headers = { 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8', 'X-Content-Type-Options': 'nosniff' }
 
@@ -34,10 +35,14 @@ export function registrationResponse(leads: LeadRecord[], total: number, page: n
     page,
     pageSize,
     records: leads.map((lead) => ({
+      firstName: lead.first_name,
+      email: lead.email,
       initials: initials(lead.first_name),
       date: formatDate(lead.created_at),
       time: formatTime(lead.created_at),
       dosha: lead.dominant_dosha,
+      secondaryDosha: lead.secondary_dosha,
+      isBalanced: lead.is_balanced,
       marketingConsent: lead.marketing_consent,
     })),
   }
@@ -49,6 +54,7 @@ export default async function handler(request: IncomingMessage, response: Server
     send(response, 405, { error: 'Método não permitido.' })
     return
   }
+  if (!requireDashboardSession(request, response)) return
 
   const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '')
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -64,7 +70,7 @@ export default async function handler(request: IncomingMessage, response: Server
   const requestedConsent = requestUrl.searchParams.get('marketing')
   const marketing = requestedConsent === 'true' || requestedConsent === 'false' ? requestedConsent : null
   const pageSize = 20
-  const params = new URLSearchParams({ select: 'first_name,dominant_dosha,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
+  const params = new URLSearchParams({ select: 'first_name,email,dominant_dosha,secondary_dosha,is_balanced,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
   if (dosha) params.set('dominant_dosha', `eq.${dosha}`)
   if (marketing) params.set('marketing_consent', `eq.${marketing}`)
 

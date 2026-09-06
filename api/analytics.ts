@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { requireDashboardSession } from './_lib/dashboard-auth'
 
 type ApiRequest = IncomingMessage
 
@@ -104,6 +105,7 @@ export default async function handler(request: ApiRequest, response: ServerRespo
     send(response, 405, { error: 'Método não permitido.' })
     return
   }
+  if (!requireDashboardSession(request, response)) return
 
   const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '')
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY

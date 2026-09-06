@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/painel", "destination": "/index.html" },
-    { "source": "/cadastros", "destination": "/index.html" }
+    { "source": "/cadastros", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" }
   ]
 }
