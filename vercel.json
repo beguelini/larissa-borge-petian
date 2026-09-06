@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/painel", "destination": "/index.html" }
+  ]
+}

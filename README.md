@@ -46,6 +46,10 @@ npx supabase db push
 npx supabase test db
 ```
 
+## Painel de interesse
+
+O painel em `/painel` consolida cadastros, consentimento de marketing, distribuição de doshas e a evolução diária. Ele consulta apenas dados agregados através da Function `/api/analytics`; nomes e e-mails não são retornados ao navegador.
+
 ## Privacidade e conteúdo
 
 - O consentimento necessário para liberar o resultado é separado do consentimento opcional de marketing.
