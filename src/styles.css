@@ -245,7 +245,7 @@ button {
 .reference-main { min-width: 0; padding: 38px 46px 64px 36px; }
 .reference-topbar { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
 .reference-topbar h1, .reference-card h2 { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; color: #123728; }
-.reference-topbar h1 { font-size: clamp(2.8rem, 4.5vw, 4.4rem); line-height: .98; }
+.reference-topbar h1 { font-size: clamp(2.8rem, 4vw, 3.25rem); line-height: .98; }
 .reference-date-control { min-width: 310px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border: 1.5px solid #315d38; border-radius: 8px; color: #274a35; font-size: .94rem; }
 .reference-date-control span { flex: 1; white-space: nowrap; }
 
@@ -262,7 +262,7 @@ button {
 .reference-card { padding: 24px 34px; }
 .reference-card h2 { font-size: 1.52rem; line-height: 1; }
 .reference-dosha-card { margin-top: 20px; min-height: 260px; }
-.reference-dosha-list { display: grid; gap: 25px; margin-top: 25px; }
+.reference-dosha-list { display: grid; gap: 12px; margin-top: 18px; }
 .reference-dosha-row { display: grid; grid-template-columns: 54px 105px minmax(60px, 1fr) 72px; gap: 17px; align-items: center; }
 .reference-dosha-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; }
 .reference-dosha-icon.vata { color: #758d5c; background: #edf0e7; }.reference-dosha-icon.pitta { color: #cc5e3d; background: #faeae5; }.reference-dosha-icon.kapha { color: #607c4f; background: #edf0e7; }
