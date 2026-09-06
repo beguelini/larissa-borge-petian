@@ -1,6 +1,6 @@
 import { Clock3, Headphones, Info, NotebookPen, RotateCcw, Users, Waves } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
-import { Brand } from './Brand'
+import { FooterLogo } from './FooterLogo'
 import { RitmoEssencialDrawing } from './Illustrations'
 
 type ResultScreenProps = {
@@ -109,8 +109,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
 
   return (
     <div className="result-screen">
-      <header className="app-header shell result-header">
-        <Brand />
+      <header className="app-header app-header-actions shell result-header">
         <button className="text-button restart-button" type="button" onClick={onRestart}>
           <RotateCcw aria-hidden="true" size={18} /> Refazer
         </button>
@@ -181,6 +180,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
           </div>
         </div>
       </section>
+      <FooterLogo />
     </div>
   )
 }

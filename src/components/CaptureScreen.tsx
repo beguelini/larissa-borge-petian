@@ -1,7 +1,7 @@
 import { ArrowLeft, Check, ShieldCheck } from 'lucide-react'
 import { FormEvent, useState } from 'react'
 import type { LeadFormData } from '../types'
-import { Brand } from './Brand'
+import { FooterLogo } from './FooterLogo'
 
 type CaptureScreenProps = {
   onSubmit: (form: LeadFormData) => Promise<void>
@@ -46,7 +46,6 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
 
   return (
     <div className="app-screen capture-screen">
-      <header className="app-header shell"><Brand /></header>
       <div className="quiz-progress shell capture-progress">
         <span>15 de 15</span>
         <div className="progress-track" aria-hidden="true"><div className="progress-value" style={{ width: '100%' }} /></div>
@@ -124,6 +123,7 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
           <ArrowLeft aria-hidden="true" size={21} /> Voltar à última pergunta
         </button>
       </section>
+      <FooterLogo />
     </div>
   )
 }

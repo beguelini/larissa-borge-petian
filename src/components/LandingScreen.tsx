@@ -1,5 +1,6 @@
 import { ArrowRight, ClipboardCheck } from 'lucide-react'
 import { BotanicalRhythm, BotanicalSprig } from './Illustrations'
+import { FooterLogo } from './FooterLogo'
 
 type LandingScreenProps = {
   onStart: () => void
@@ -46,7 +47,7 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
         </div>
       </section>
 
-      <footer className="landing-footer">Ayurveda para a vida real</footer>
+      <FooterLogo className="landing-footer" />
     </div>
   )
 }
