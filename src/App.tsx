@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CaptureScreen } from './components/CaptureScreen'
 import { AnalyticsScreen } from './components/AnalyticsScreen'
+import { RegistrationsScreen } from './components/RegistrationsScreen'
 import { LandingScreen } from './components/LandingScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
@@ -29,6 +30,7 @@ function readProgress(): { answers: QuizAnswers; currentQuestion: number } {
 
 export default function App() {
   const isAnalyticsRoute = window.location.pathname === '/painel'
+  const isRegistrationsRoute = window.location.pathname === '/cadastros'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
   const [answers, setAnswers] = useState<QuizAnswers>(savedProgress.answers)
@@ -113,7 +115,7 @@ export default function App() {
 
   return (
     <main>
-      {isAnalyticsRoute ? <AnalyticsScreen /> : <>
+      {isAnalyticsRoute ? <AnalyticsScreen /> : isRegistrationsRoute ? <RegistrationsScreen /> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen

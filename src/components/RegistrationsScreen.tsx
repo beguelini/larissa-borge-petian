@@ -1,0 +1,50 @@
+import { ChevronLeft, ChevronRight, RefreshCw, SlidersHorizontal } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import type { Dosha } from '../types'
+import { DashboardSidebar } from './DashboardSidebar'
+
+type Registration = { initials: string; date: string; time: string; dosha: Dosha; marketingConsent: boolean }
+type RegistrationResponse = { total: number; page: number; pageSize: number; records: Registration[] }
+type Filters = { dosha: string; marketing: string }
+
+const doshaLabel: Record<Dosha, string> = { vata: 'Vata', pitta: 'Pitta', kapha: 'Kapha' }
+
+function fetchRegistrations(page: number, filters: Filters) {
+  const params = new URLSearchParams({ page: String(page) })
+  if (filters.dosha) params.set('dosha', filters.dosha)
+  if (filters.marketing) params.set('marketing', filters.marketing)
+  return fetch(`/api/registrations?${params}`).then((response) => {
+    if (!response.ok) throw new Error('Falha ao carregar cadastros')
+    return response.json() as Promise<RegistrationResponse>
+  })
+}
+
+export function RegistrationsScreen() {
+  const [filters, setFilters] = useState<Filters>({ dosha: '', marketing: '' })
+  const [page, setPage] = useState(1)
+  const [data, setData] = useState<RegistrationResponse | null>(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  function load(nextPage = page, nextFilters = filters) {
+    setLoading(true); setError('')
+    void fetchRegistrations(nextPage, nextFilters)
+      .then(setData)
+      .catch(() => setError('Não foi possível carregar os cadastros agora.'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    void fetchRegistrations(1, filters)
+      .then(setData)
+      .catch(() => setError('Não foi possível carregar os cadastros agora.'))
+      .finally(() => setLoading(false))
+  }, [filters])
+  const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 20)))
+
+  return <div className="reference-dashboard registrations-dashboard"><DashboardSidebar active="registrations" /><main className="reference-main registrations-main">
+    <header className="registrations-header"><div><h1>Cadastros</h1><p>Acompanhe as novas interessadas no pré-lançamento.</p></div><button className="registrations-refresh" type="button" onClick={() => load()} disabled={loading}><RefreshCw aria-hidden="true" size={18} className={loading ? 'is-spinning' : ''} /> Atualizar</button></header>
+    <section className="registrations-filters" aria-label="Filtros de cadastros"><span><SlidersHorizontal aria-hidden="true" size={18} /> Filtrar por</span><label>Dosha<select value={filters.dosha} onChange={(event) => { setPage(1); setFilters((current) => ({ ...current, dosha: event.target.value })) }}><option value="">Todos os doshas</option><option value="vata">Vata</option><option value="pitta">Pitta</option><option value="kapha">Kapha</option></select></label><label>Marketing<select value={filters.marketing} onChange={(event) => { setPage(1); setFilters((current) => ({ ...current, marketing: event.target.value })) }}><option value="">Todos</option><option value="true">Com consentimento</option><option value="false">Sem consentimento</option></select></label></section>
+    {error ? <p className="reference-error" role="alert">{error}</p> : <section className="registrations-table-card"><div className="registrations-table-heading"><div><h2>Interessadas</h2><p>{data?.total ?? 0} cadastros encontrados</p></div><small>Dados pessoais preservados</small></div><div className="registrations-table" role="table" aria-label="Lista de cadastros"><div className="registrations-row registrations-columns" role="row"><span>Interessada</span><span>Data</span><span>Dosha</span><span>Marketing</span></div>{data?.records.map((record, index) => <div className="registrations-row" role="row" key={`${record.initials}-${record.date}-${index}`}><span className="registration-person"><i>{record.initials}</i>Cadastro protegido</span><span>{record.date}<small>{record.time}</small></span><span><b className={`registration-dosha ${record.dosha}`}>{doshaLabel[record.dosha]}</b></span><span><em className={record.marketingConsent ? 'is-yes' : 'is-no'}>{record.marketingConsent ? 'Autorizado' : 'Não autorizado'}</em></span></div>)}</div>{!loading && !data?.records.length && <p className="registrations-empty">Nenhum cadastro encontrado com estes filtros.</p>}<footer className="registrations-pagination"><span>Página {data?.page ?? 1} de {totalPages}</span><div><button type="button" aria-label="Página anterior" onClick={() => { const next = Math.max(1, page - 1); setPage(next); load(next) }} disabled={loading || page === 1}><ChevronLeft size={19} /></button><button type="button" aria-label="Próxima página" onClick={() => { const next = Math.min(totalPages, page + 1); setPage(next); load(next) }} disabled={loading || page >= totalPages}><ChevronRight size={19} /></button></div></footer></section>}
+  </main></div>
+}
