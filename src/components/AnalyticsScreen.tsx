@@ -1,10 +1,10 @@
 import {
-  BarChart3, CalendarDays, ChevronDown, ChevronRight, Flame, Home, Leaf,
-  LineChart, RefreshCw, Settings, ShieldCheck, Users, Wind,
+  CalendarDays, ChevronDown, ChevronRight, Flame, Leaf,
+  RefreshCw, ShieldCheck, Users, Wind,
 } from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Dosha } from '../types'
-import { BotanicalSprig } from './Illustrations'
+import { DashboardSidebar } from './DashboardSidebar'
 
 type RecentLead = { initials: string; timeLabel: string; dosha: Dosha }
 type DayRegistration = { date: string; count: number }
@@ -34,15 +34,6 @@ function emptyAnalytics(): Analytics {
   return { total: 0, today: 0, marketingConsentRate: 0, balancedCount: 0, dominantDosha: null, doshas: { vata: 0, pitta: 0, kapha: 0 }, registrationsByDay: [], recentLeads: [] }
 }
 
-function DashboardNav() {
-  const items = [{ label: 'Painel', icon: Home, active: true }, { label: 'Cadastros', icon: Users }, { label: 'Doshas', icon: LineChart }, { label: 'Relatórios', icon: BarChart3 }, { label: 'Configurações', icon: Settings }]
-  return <aside className="reference-sidebar" aria-label="Navegação do painel">
-    <a className="reference-mark" href="/" aria-label="Voltar ao quiz"><Leaf size={43} strokeWidth={1.35} /></a>
-    <nav>{items.map(({ label, icon: Icon, active }) => <a className={`reference-nav-item ${active ? 'is-active' : ''}`} href="#painel" key={label}><Icon aria-hidden="true" size={22} strokeWidth={1.5} /> {label}</a>)}</nav>
-    <div className="reference-sidebar-rule" /><BotanicalSprig className="reference-sidebar-sprig" />
-  </aside>
-}
-
 export function AnalyticsScreen() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [error, setError] = useState('')
@@ -60,7 +51,7 @@ export function AnalyticsScreen() {
   const dominantLabel = data.dominantDosha ? doshaLabel[data.dominantDosha] : '—'
   const graph = useMemo(() => chartPath(data.registrationsByDay, maxDaily), [data.registrationsByDay, maxDaily])
 
-  return <div className="reference-dashboard" id="painel"><DashboardNav /><main className="reference-main">
+  return <div className="reference-dashboard" id="painel"><DashboardSidebar active="panel" /><main className="reference-main">
     <header className="reference-topbar"><h1>Painel de interesse</h1><div className="reference-date-control"><CalendarDays aria-hidden="true" size={19} strokeWidth={1.65} /><span>{formatRange(data.registrationsByDay)}</span><ChevronDown aria-hidden="true" size={18} strokeWidth={1.6} /></div></header>
     {error ? <div className="reference-error" role="alert">{error}</div> : <>
       <section className="reference-metrics" aria-label="Indicadores dos cadastros">
