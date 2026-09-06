@@ -47,10 +47,11 @@ export function hasDashboardSession(request: IncomingMessage) {
   }
 }
 
-export function isDashboardPasswordValid(password: string) {
+export function areDashboardCredentialsValid(username: string, password: string) {
+  const configuredUsername = process.env.DASHBOARD_USERNAME
   const configuredPassword = process.env.DASHBOARD_PASSWORD
-  if (!configuredPassword) return false
-  return signaturesMatch(password, configuredPassword)
+  if (!configuredUsername || !configuredPassword) return false
+  return signaturesMatch(username, configuredUsername) && signaturesMatch(password, configuredPassword)
 }
 
 export function setDashboardSession(response: ServerResponse) {

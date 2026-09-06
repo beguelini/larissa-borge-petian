@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { isDashboardPasswordValid, setDashboardSession } from '../_lib/dashboard-auth.js'
+import { areDashboardCredentialsValid, setDashboardSession } from '../_lib/dashboard-auth.js'
 
 async function readBody(request: IncomingMessage) {
   let body = ''
@@ -7,7 +7,7 @@ async function readBody(request: IncomingMessage) {
     body += chunk
     if (body.length > 4_096) throw new Error('Payload muito grande')
   }
-  return JSON.parse(body) as { password?: unknown }
+  return JSON.parse(body) as { username?: unknown; password?: unknown }
 }
 
 export default async function handler(request: IncomingMessage, response: ServerResponse) {
@@ -21,8 +21,8 @@ export default async function handler(request: IncomingMessage, response: Server
   }
 
   try {
-    const { password } = await readBody(request)
-    if (typeof password !== 'string' || !isDashboardPasswordValid(password)) {
+    const { username, password } = await readBody(request)
+    if (typeof username !== 'string' || typeof password !== 'string' || !areDashboardCredentialsValid(username, password)) {
       response.statusCode = 401
       response.end(JSON.stringify({ error: 'Senha inválida.' }))
       return

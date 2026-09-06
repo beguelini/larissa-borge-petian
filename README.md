@@ -33,7 +33,7 @@ Copie `.env.example` apenas como referência. Na Vercel, configure:
 
 - `SUPABASE_URL`: URL do projeto Supabase, somente no servidor.
 - `SUPABASE_SERVICE_ROLE_KEY`: service role, somente no servidor. Nunca use prefixo `VITE_`.
-- `DASHBOARD_PASSWORD`: senha de acesso ao painel administrativo.
+- `DASHBOARD_USERNAME` e `DASHBOARD_PASSWORD`: credenciais de acesso ao painel administrativo.
 - `DASHBOARD_SESSION_SECRET`: segredo aleatório de pelo menos 32 caracteres usado para assinar a sessão do painel.
 
 ## Banco de dados
