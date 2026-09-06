@@ -481,7 +481,7 @@ img {
   opacity: 0.58;
 }
 
-.site-footer { display: flex; justify-content: center; align-items: center; padding: 28px 18px calc(28px + env(safe-area-inset-bottom)); }.site-footer img { width: min(142px, 42vw); height: auto; opacity: .8; }.landing-footer { border-top: 1px solid rgba(99, 72, 43, .1); background: var(--cream-soft); }.reference-footer { padding-top: 38px; }.reference-footer img { width: 128px; opacity: .68; }.login-footer { padding: 24px 0 0; }.login-footer img { width: 118px; opacity: .72; }.privacy-footer { padding: 20px 0 0; }.privacy-footer img { width: 104px; }
+.home-editorial { display: flex; justify-content: center; padding: 12px 18px 58px; background: var(--cream-soft); }.home-editorial-frame { width: min(100%, 390px); margin: 0; overflow: hidden; border: 1px solid rgba(77, 89, 57, .13); border-radius: 18px; background: #f7f0e4; box-shadow: 0 18px 44px rgba(37, 51, 32, .14); }.home-editorial-frame img { width: 100%; height: auto; }.site-footer { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 7px; padding: 28px 18px calc(28px + env(safe-area-inset-bottom)); }.site-footer img { width: min(185px, 55vw); height: auto; opacity: .8; }.site-footer span { color: #5e6c58; font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }.landing-footer { border-top: 1px solid rgba(99, 72, 43, .1); background: var(--cream-soft); }.reference-footer { padding-top: 38px; }.reference-footer img { width: 166px; opacity: .68; }.login-footer { padding: 24px 0 0; }.login-footer img { width: 153px; opacity: .72; }.privacy-footer { padding: 20px 0 0; }.privacy-footer img { width: 135px; }
 
 .app-screen {
   min-height: 100vh;
@@ -1105,6 +1105,9 @@ img {
     margin-top: 8px;
     margin-bottom: 70px;
   }
+
+  .home-editorial { padding: 0 32px 88px; }
+  .home-editorial-frame { width: 430px; border-radius: 22px; }
 
   .gentle-path-inner { min-height: 330px; display: flex; align-items: center; }
   .gentle-path-inner > div:first-child { max-width: 540px; }

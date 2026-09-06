@@ -37,6 +37,12 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
         </div>
       </section>
 
+      <section className="home-editorial" aria-label="Conheça o Ayurveda">
+        <figure className="home-editorial-frame">
+          <img src="/ads-teste-dosha-gratuito-v2.png" alt="Material introdutório: você já cuida do seu bem-estar, agora conheça o Ayurveda." />
+        </figure>
+      </section>
+
       <section className="gentle-path">
         <div className="shell gentle-path-inner">
           <div>
