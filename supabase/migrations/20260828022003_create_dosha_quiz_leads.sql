@@ -22,7 +22,7 @@ create table public.dosha_quiz_leads (
 );
 
 comment on table public.dosha_quiz_leads is
-  'Leads e resultados do questionario educativo de doshas da Larissa Borge Petian.';
+  'Leads e resultados do questionario educativo de doshas da Larissa Petian.';
 
 create index dosha_quiz_leads_created_at_idx
   on public.dosha_quiz_leads (created_at desc);
