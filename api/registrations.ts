@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { requireDashboardSession } from './_lib/dashboard-auth'
+import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
 type Dosha = 'vata' | 'pitta' | 'kapha'
 type LeadRecord = { first_name: string; email: string; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }

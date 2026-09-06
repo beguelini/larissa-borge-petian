@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { hasDashboardSession } from '../_lib/dashboard-auth'
+import { hasDashboardSession } from '../_lib/dashboard-auth.js'
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   if (request.method !== 'GET') {

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { requireDashboardSession } from './_lib/dashboard-auth'
+import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
 type ApiRequest = IncomingMessage
 

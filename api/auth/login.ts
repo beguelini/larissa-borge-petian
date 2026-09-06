@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { isDashboardPasswordValid, setDashboardSession } from '../_lib/dashboard-auth'
+import { isDashboardPasswordValid, setDashboardSession } from '../_lib/dashboard-auth.js'
 
 async function readBody(request: IncomingMessage) {
   let body = ''

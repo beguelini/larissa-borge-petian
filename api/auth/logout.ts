@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { clearDashboardSession } from '../_lib/dashboard-auth'
+import { clearDashboardSession } from '../_lib/dashboard-auth.js'
 
 export default function handler(request: IncomingMessage, response: ServerResponse) {
   if (request.method !== 'POST') {
