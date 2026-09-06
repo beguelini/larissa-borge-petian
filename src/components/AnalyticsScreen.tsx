@@ -1,167 +1,100 @@
-import { BarChart3, CalendarDays, HeartHandshake, Leaf, RefreshCw, Users } from 'lucide-react'
+import {
+  BarChart3, CalendarDays, ChevronDown, ChevronRight, Flame, Home, Leaf,
+  LineChart, RefreshCw, Settings, ShieldCheck, Users, Wind,
+} from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Dosha } from '../types'
-import { Brand } from './Brand'
+import { BotanicalSprig } from './Illustrations'
 
+type RecentLead = { initials: string; timeLabel: string; dosha: Dosha }
+type DayRegistration = { date: string; count: number }
 type Analytics = {
-  total: number
-  today: number
-  marketingConsentRate: number
-  balancedCount: number
-  dominantDosha: Dosha | null
-  doshas: Record<Dosha, number>
-  registrationsByDay: { date: string; count: number }[]
+  total: number; today: number; marketingConsentRate: number; balancedCount: number
+  dominantDosha: Dosha | null; doshas: Record<Dosha, number>
+  registrationsByDay: DayRegistration[]; recentLeads: RecentLead[]
 }
 
 const doshaLabel: Record<Dosha, string> = { vata: 'Vata', pitta: 'Pitta', kapha: 'Kapha' }
 const doshaClass: Record<Dosha, string> = { vata: 'vata', pitta: 'pitta', kapha: 'kapha' }
 
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(
-    new Date(`${date}T12:00:00`),
-  )
+function requestAnalytics() {
+  return fetch('/api/analytics').then((response) => {
+    if (!response.ok) throw new Error('Falha ao carregar o painel')
+    return response.json() as Promise<Analytics>
+  })
+}
+
+function formatRange(days: DayRegistration[]) {
+  if (!days.length) return 'Últimos 30 dias'
+  const format = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return `${format.format(new Date(`${days[0].date}T12:00:00`))} – ${format.format(new Date(`${days.at(-1)!.date}T12:00:00`))}`
 }
 
 function emptyAnalytics(): Analytics {
-  return {
-    total: 0,
-    today: 0,
-    marketingConsentRate: 0,
-    balancedCount: 0,
-    dominantDosha: null,
-    doshas: { vata: 0, pitta: 0, kapha: 0 },
-    registrationsByDay: [],
-  }
+  return { total: 0, today: 0, marketingConsentRate: 0, balancedCount: 0, dominantDosha: null, doshas: { vata: 0, pitta: 0, kapha: 0 }, registrationsByDay: [], recentLeads: [] }
+}
+
+function DashboardNav() {
+  const items = [{ label: 'Painel', icon: Home, active: true }, { label: 'Cadastros', icon: Users }, { label: 'Doshas', icon: LineChart }, { label: 'Relatórios', icon: BarChart3 }, { label: 'Configurações', icon: Settings }]
+  return <aside className="reference-sidebar" aria-label="Navegação do painel">
+    <a className="reference-mark" href="/" aria-label="Voltar ao quiz"><Leaf size={43} strokeWidth={1.35} /></a>
+    <nav>{items.map(({ label, icon: Icon, active }) => <a className={`reference-nav-item ${active ? 'is-active' : ''}`} href="#painel" key={label}><Icon aria-hidden="true" size={22} strokeWidth={1.5} /> {label}</a>)}</nav>
+    <div className="reference-sidebar-rule" /><BotanicalSprig className="reference-sidebar-sprig" />
+  </aside>
 }
 
 export function AnalyticsScreen() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-
-  async function requestAnalytics() {
-    const response = await fetch('/api/analytics')
-    if (!response.ok) throw new Error('Falha ao carregar o painel')
-    return response.json() as Promise<Analytics>
-  }
-
   function loadAnalytics() {
-    setLoading(true)
-    setError('')
-    void requestAnalytics()
-      .then(setAnalytics)
-      .catch(() => setError('Não foi possível carregar os indicadores agora. Tente atualizar novamente.'))
-      .finally(() => setLoading(false))
+    setLoading(true); setError('')
+    void requestAnalytics().then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }
-
-  useEffect(() => {
-    void requestAnalytics()
-      .then(setAnalytics)
-      .catch(() => setError('Não foi possível carregar os indicadores agora. Tente atualizar novamente.'))
-      .finally(() => setLoading(false))
-  }, [])
+  useEffect(() => { void requestAnalytics().then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false)) }, [])
 
   const data = analytics ?? emptyAnalytics()
-  const largestDoshaCount = Math.max(...Object.values(data.doshas), 1)
-  const largestDayCount = Math.max(...data.registrationsByDay.map(({ count }) => count), 1)
   const totalProfiled = Object.values(data.doshas).reduce((sum, value) => sum + value, 0)
+  const maxCount = Math.max(...Object.values(data.doshas), 1)
+  const maxDaily = Math.max(...data.registrationsByDay.map(({ count }) => count), 3)
   const dominantLabel = data.dominantDosha ? doshaLabel[data.dominantDosha] : '—'
-  const balancedRate = data.total ? Math.round((data.balancedCount / data.total) * 100) : 0
+  const graph = useMemo(() => chartPath(data.registrationsByDay, maxDaily), [data.registrationsByDay, maxDaily])
 
-  const registrationPoints = useMemo(() => data.registrationsByDay.map(({ count }, index, entries) => {
-    const x = entries.length === 1 ? 50 : (index / (entries.length - 1)) * 100
-    const y = 100 - (count / largestDayCount) * 84 - 8
-    return `${x},${y}`
-  }).join(' '), [data.registrationsByDay, largestDayCount])
-
-  return (
-    <div className="analytics-screen">
-      <header className="analytics-header shell">
-        <Brand />
-        <a className="analytics-back" href="/">Ver quiz</a>
-      </header>
-
-      <main className="analytics-shell shell">
-        <div className="analytics-title-row">
-          <div>
-            <p className="analytics-kicker">Pré-lançamento</p>
-            <h1>Painel de interesse</h1>
-            <p>Leitura consolidada dos cadastros e dos perfis de dosha.</p>
-          </div>
-          <button className="analytics-refresh" type="button" onClick={loadAnalytics} disabled={loading}>
-            <RefreshCw aria-hidden="true" size={18} className={loading ? 'is-spinning' : ''} />
-            Atualizar
-          </button>
-        </div>
-
-        {error ? (
-          <div className="analytics-error" role="alert">{error}</div>
-        ) : (
-          <>
-            <section className="metric-grid" aria-label="Indicadores dos cadastros">
-              <Metric icon={<Users />} label="Cadastros" value={data.total} detail="Total registrado" />
-              <Metric icon={<CalendarDays />} label="Hoje" value={data.today} detail="No horário de Brasília" />
-              <Metric icon={<HeartHandshake />} label="Consentimento" value={`${data.marketingConsentRate}%`} detail="Para receber novidades" />
-              <Metric icon={<Leaf />} label="Dosha predominante" value={dominantLabel} detail={data.total ? `${balancedRate}% com perfil equilibrado` : 'Aguardando cadastros'} />
-            </section>
-
-            <section className="analytics-card dosha-card">
-              <div className="card-heading">
-                <div>
-                  <p className="analytics-kicker">Perfil de doshas</p>
-                  <h2>Como as interessadas se distribuem</h2>
-                </div>
-                <span>{totalProfiled} leituras</span>
-              </div>
-              <div className="dosha-bars">
-                {(['vata', 'pitta', 'kapha'] as Dosha[]).map((dosha) => {
-                  const count = data.doshas[dosha]
-                  const percentage = totalProfiled ? Math.round((count / totalProfiled) * 100) : 0
-                  return (
-                    <div className="dosha-bar-row" key={dosha}>
-                      <span className={`dosha-dot ${doshaClass[dosha]}`} aria-hidden="true" />
-                      <strong>{doshaLabel[dosha]}</strong>
-                      <div className="dosha-bar-track" aria-label={`${doshaLabel[dosha]}: ${percentage}%`}>
-                        <div className={`dosha-bar-fill ${doshaClass[dosha]}`} style={{ width: `${(count / largestDoshaCount) * 100}%` }} />
-                      </div>
-                      <span>{count} <small>({percentage}%)</small></span>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-
-            <section className="analytics-card registrations-card">
-              <div className="card-heading">
-                <div>
-                  <p className="analytics-kicker">Cadastros por dia</p>
-                  <h2>Últimos 14 dias com movimentação</h2>
-                </div>
-                <BarChart3 aria-hidden="true" size={25} />
-              </div>
-              {data.registrationsByDay.length ? (
-                <div className="registration-chart" role="img" aria-label="Gráfico de cadastros diários">
-                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                    <polyline points={registrationPoints} fill="none" stroke="currentColor" strokeWidth="2.7" vectorEffect="non-scaling-stroke" />
-                    {data.registrationsByDay.map(({ count }, index, entries) => {
-                      const x = entries.length === 1 ? 50 : (index / (entries.length - 1)) * 100
-                      const y = 100 - (count / largestDayCount) * 84 - 8
-                      return <circle key={index} cx={x} cy={y} r="2.2" fill="currentColor" vectorEffect="non-scaling-stroke" />
-                    })}
-                  </svg>
-                  <div className="chart-labels">
-                    {data.registrationsByDay.map(({ date, count }) => <span key={date}>{formatDate(date)}<strong>{count}</strong></span>)}
-                  </div>
-                </div>
-              ) : <p className="analytics-empty">Os indicadores aparecerão assim que os primeiros cadastros forem concluídos.</p>}
-            </section>
-          </>
-        )}
-      </main>
-    </div>
-  )
+  return <div className="reference-dashboard" id="painel"><DashboardNav /><main className="reference-main">
+    <header className="reference-topbar"><h1>Painel de interesse</h1><div className="reference-date-control"><CalendarDays aria-hidden="true" size={19} strokeWidth={1.65} /><span>{formatRange(data.registrationsByDay)}</span><ChevronDown aria-hidden="true" size={18} strokeWidth={1.6} /></div></header>
+    {error ? <div className="reference-error" role="alert">{error}</div> : <>
+      <section className="reference-metrics" aria-label="Indicadores dos cadastros">
+        <Metric icon={<Users />} label="Cadastros" value={data.total} detail="Total no período" />
+        <Metric icon={<CalendarDays />} label="Hoje" value={data.today} detail="Cadastros hoje" />
+        <Metric icon={<ShieldCheck />} label={<>Consentimento<br />de marketing</>} value={`${data.marketingConsentRate}%`} detail="Dos cadastros" />
+        <Metric icon={<Leaf />} label="Perfil de doshas" value={dominantLabel} detail={data.total ? 'Predominante' : 'Aguardando cadastros'} accent />
+      </section>
+      <section className="reference-card reference-dosha-card"><h2>Perfil de doshas</h2><div className="reference-dosha-list">
+        {(['vata', 'pitta', 'kapha'] as Dosha[]).map((dosha) => {
+          const count = data.doshas[dosha]; const percentage = totalProfiled ? Math.round((count / totalProfiled) * 100) : 0
+          const DoshaIcon = dosha === 'vata' ? Wind : dosha === 'pitta' ? Flame : Leaf
+          return <div className="reference-dosha-row" key={dosha}><span className={`reference-dosha-icon ${doshaClass[dosha]}`}><DoshaIcon aria-hidden="true" size={24} strokeWidth={1.45} /></span><span className="reference-dosha-name">{doshaLabel[dosha]}</span><div className="reference-dosha-track"><span className={`reference-dosha-fill ${doshaClass[dosha]}`} style={{ width: `${(count / maxCount) * 100}%` }} /></div><span className="reference-dosha-percent">{percentage}%</span></div>
+        })}
+      </div></section>
+      <section className="reference-lower-grid">
+        <div className="reference-card reference-chart-card"><h2>Cadastros por dia</h2>{data.registrationsByDay.length ? <RegistrationChart graph={graph} maxDaily={maxDaily} days={data.registrationsByDay} /> : <p className="reference-empty">Os pontos diários aparecerão com os primeiros cadastros.</p>}</div>
+        <div className="reference-card reference-recent-card"><h2>Cadastros recentes</h2>{data.recentLeads.length ? <div className="reference-recent-list">{data.recentLeads.map((lead, index) => <div className="reference-recent-row" key={`${lead.initials}-${index}`}><span className={`reference-initials ${doshaClass[lead.dosha]}`}>{lead.initials}</span><span>{lead.timeLabel}</span><strong className={doshaClass[lead.dosha]}><i />{doshaLabel[lead.dosha]}</strong></div>)}</div> : <p className="reference-empty">Os novos cadastros aparecerão aqui.</p>}<button className="reference-see-all" type="button" onClick={loadAnalytics} disabled={loading}>{loading ? <RefreshCw className="is-spinning" size={16} /> : <>Ver todos <ChevronRight aria-hidden="true" size={18} /></>}</button></div>
+      </section>
+    </>}
+  </main></div>
 }
 
-function Metric({ icon, label, value, detail }: { icon: ReactNode; label: string; value: string | number; detail: string }) {
-  return <article className="metric-card"><span className="metric-icon" aria-hidden="true">{icon}</span><div><p>{label}</p><strong>{value}</strong><small>{detail}</small></div></article>
+function Metric({ icon, label, value, detail, accent = false }: { icon: ReactNode; label: ReactNode; value: string | number; detail: string; accent?: boolean }) {
+  return <article className={`reference-metric ${accent ? 'is-accent' : ''}`}><span className="reference-metric-icon">{icon}</span><div><p>{label}</p><strong>{value}</strong><small>{detail}</small></div></article>
+}
+
+function RegistrationChart({ graph, maxDaily, days }: { graph: { points: string; dots: { x: number; y: number }[] }; maxDaily: number; days: DayRegistration[] }) {
+  const markers = [maxDaily, Math.round(maxDaily * 0.75), Math.round(maxDaily * 0.5), Math.round(maxDaily * 0.25), 0]
+  const labels = days.filter((_, index) => index % Math.ceil(days.length / 6) === 0 || index === days.length - 1)
+  return <div className="reference-chart"><div className="reference-axis">{markers.map((marker, index) => <span key={`${marker}-${index}`}>{marker}</span>)}</div><div className="reference-chart-plot"><svg viewBox="0 0 520 220" preserveAspectRatio="none" role="img" aria-label="Evolução de cadastros por dia"><g className="reference-grid-lines">{[0, 1, 2, 3, 4].map((line) => <line key={line} x1="0" x2="520" y1={15 + line * 47} y2={15 + line * 47} />)}</g><polyline points={graph.points} fill="none" stroke="currentColor" strokeWidth="2.4" vectorEffect="non-scaling-stroke" />{graph.dots.map(({ x, y }, index) => <circle key={index} cx={x} cy={y} r="4.3" fill="currentColor" vectorEffect="non-scaling-stroke" />)}</svg><div className="reference-chart-labels">{labels.map(({ date }) => <span key={date}>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(`${date}T12:00:00`))}</span>)}</div><p><i />Cadastros</p></div></div>
+}
+
+function chartPath(days: DayRegistration[], maxDaily: number) {
+  const dots = days.map(({ count }, index) => ({ x: days.length === 1 ? 260 : 14 + (index / (days.length - 1)) * 492, y: 203 - (count / maxDaily) * 188 }))
+  return { dots, points: dots.map(({ x, y }) => `${x},${y}`).join(' ') }
 }
