@@ -217,6 +217,63 @@ button {
   .registration-chart svg { height: 150px; }
 }
 
+/* Analytics dashboard — matched to the approved reference composition. */
+.reference-dashboard {
+  min-height: 100vh;
+  background: #fffefc;
+  color: #183b2e;
+  display: grid;
+  grid-template-columns: 202px minmax(0, 1fr);
+}
+
+.reference-sidebar {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 44px 16px 20px;
+  border-right: 1px solid #ddd9d0;
+  background: #fdfcf8;
+}
+
+.reference-mark { display: grid; place-items: center; width: 62px; height: 55px; margin: 0 auto 32px; color: #456537; }
+.reference-sidebar nav { display: grid; gap: 8px; }
+.reference-nav-item { min-height: 54px; display: flex; align-items: center; gap: 19px; padding: 0 16px; color: #17261e; border-radius: 8px; text-decoration: none; font-size: 1rem; }
+.reference-nav-item.is-active { color: #315428; background: #ecece2; }
+.reference-sidebar-rule { height: 1px; margin: 36px 8px 0; background: #d9d5cd; }
+.reference-sidebar-sprig { position: absolute; width: 220px; left: -21px; bottom: 28px; color: #ded9c9; opacity: .9; }
+
+.reference-main { min-width: 0; padding: 38px 46px 64px 36px; }
+.reference-topbar { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.reference-topbar h1, .reference-card h2 { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; color: #123728; }
+.reference-topbar h1 { font-size: clamp(2.8rem, 4.5vw, 4.4rem); line-height: .98; }
+.reference-date-control { min-width: 310px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border: 1.5px solid #315d38; border-radius: 8px; color: #274a35; font-size: .94rem; }
+.reference-date-control span { flex: 1; white-space: nowrap; }
+
+.reference-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 26px; }
+.reference-metric, .reference-card { border: 1px solid #dedbd4; border-radius: 8px; background: rgba(255,255,255,.72); box-shadow: 0 5px 18px rgba(26, 45, 31, .025); }
+.reference-metric { min-height: 170px; display: flex; align-items: center; gap: 23px; padding: 24px 17px; }
+.reference-metric-icon { width: 80px; height: 80px; flex: 0 0 80px; display: grid; place-items: center; border-radius: 50%; color: #496c38; background: #eef0e9; }
+.reference-metric.is-accent .reference-metric-icon { color: #cf5c3a; background: #f9ebe6; }
+.reference-metric p { margin: 0; color: #1c271f; font-size: 1.02rem; line-height: 1.08; }
+.reference-metric strong { display: block; margin: 5px 0 7px; color: #3d6431; font-family: var(--serif); font-size: clamp(2.25rem, 3vw, 3.1rem); font-weight: 400; line-height: .95; }
+.reference-metric.is-accent strong, .reference-metric.is-accent small { color: #c65335; }
+.reference-metric small { color: #527044; font-size: .95rem; }
+
+.reference-card { padding: 24px 34px; }
+.reference-card h2 { font-size: 1.52rem; line-height: 1; }
+.reference-dosha-card { margin-top: 20px; min-height: 260px; }
+.reference-dosha-list { display: grid; gap: 25px; margin-top: 25px; }
+.reference-dosha-row { display: grid; grid-template-columns: 54px 105px minmax(60px, 1fr) 72px; gap: 17px; align-items: center; }
+.reference-dosha-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; }
+.reference-dosha-icon.vata { color: #758d5c; background: #edf0e7; }.reference-dosha-icon.pitta { color: #cc5e3d; background: #faeae5; }.reference-dosha-icon.kapha { color: #607c4f; background: #edf0e7; }
+.reference-dosha-name { font-size: 1.02rem; }.reference-dosha-track { height: 22px; overflow: hidden; border-radius: 6px; background: #f1f0eb; }.reference-dosha-fill { display: block; height: 100%; border-radius: inherit; }.reference-dosha-fill.vata, .reference-dosha-fill.kapha { background: #aab99e; }.reference-dosha-fill.pitta { background: #d06140; }.reference-dosha-percent { color: #111; text-align: right; font-family: var(--serif); font-size: 1.5rem; }
+
+.reference-lower-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }.reference-chart-card, .reference-recent-card { min-height: 376px; }.reference-chart { display: grid; grid-template-columns: 36px 1fr; gap: 8px; margin-top: 22px; }.reference-axis { height: 220px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px 0 7px; color: #607060; font-size: .78rem; text-align: right; }.reference-chart-plot { min-width: 0; color: #547540; }.reference-chart svg { width: 100%; height: 220px; overflow: visible; }.reference-grid-lines line { stroke: #e5e3dc; stroke-width: 1; stroke-dasharray: 3 4; }.reference-chart-labels { display: flex; justify-content: space-between; gap: 6px; color: #565e55; font-size: .75rem; }.reference-chart-plot p { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 25px 0 0; color: #1f3826; font-size: .85rem; }.reference-chart-plot p i { width: 25px; height: 2px; background: #547540; position: relative; }.reference-chart-plot p i::after { content: ''; position: absolute; width: 6px; height: 6px; top: -2px; left: 9px; border-radius: 50%; background: #547540; }
+.reference-recent-list { margin-top: 15px; }.reference-recent-row { min-height: 52px; display: grid; grid-template-columns: 48px 1fr auto; gap: 14px; align-items: center; border-bottom: 1px solid #e6e2dc; color: #3d4d43; font-size: .88rem; }.reference-initials { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #edf0e7; color: #49633c; }.reference-initials.pitta { background: #f9e9e3; color: #c35336; }.reference-recent-row strong { display: inline-flex; align-items: center; gap: 8px; color: #6d875d; font-weight: 400; }.reference-recent-row strong.pitta { color: #d06140; }.reference-recent-row i { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }.reference-see-all { min-height: 42px; display: inline-flex; align-items: center; gap: 4px; margin-top: 15px; padding: 0; border: 0; background: transparent; color: #395e31; font: inherit; cursor: pointer; }.reference-see-all:disabled { cursor: wait; }.reference-empty { margin-top: 40px; color: #607060; line-height: 1.5; }.reference-error { margin-top: 30px; padding: 20px; border-radius: 8px; background: #f9e9e3; color: var(--danger); }
+
+@media (max-width: 980px) { .reference-dashboard { grid-template-columns: 74px minmax(0,1fr); }.reference-sidebar { padding-inline: 10px; }.reference-nav-item { justify-content: center; padding: 0; font-size: 0; }.reference-nav-item svg { margin: 0; }.reference-sidebar-sprig { display: none; }.reference-main { padding: 30px 25px 50px; }.reference-metrics { grid-template-columns: repeat(2, 1fr); }.reference-lower-grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .reference-dashboard { display: block; }.reference-sidebar { min-height: 70px; height: 70px; display: flex; align-items: center; gap: 13px; padding: 8px 18px; border-right: 0; border-bottom: 1px solid #ddd9d0; }.reference-mark { width: 40px; height: 40px; margin: 0; }.reference-mark svg { width: 30px; }.reference-sidebar nav { display: flex; flex: 1; justify-content: space-between; gap: 2px; }.reference-nav-item { min-height: 42px; width: 42px; }.reference-sidebar-rule { display: none; }.reference-main { padding: 29px 18px 40px; }.reference-topbar { align-items: flex-start; flex-direction: column; gap: 18px; }.reference-topbar h1 { font-size: 2.7rem; }.reference-date-control { width: 100%; min-width: 0; }.reference-metrics { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 19px; }.reference-metric { min-height: 130px; align-items: flex-start; gap: 9px; padding: 15px 10px; }.reference-metric-icon { width: 38px; height: 38px; flex-basis: 38px; }.reference-metric-icon svg { width: 20px; }.reference-metric p { font-size: .76rem; }.reference-metric strong { font-size: 1.8rem; }.reference-metric small { font-size: .68rem; }.reference-card { padding: 22px 16px; }.reference-dosha-row { grid-template-columns: 43px 48px minmax(45px,1fr) 45px; gap: 7px; }.reference-dosha-icon { width: 38px; height: 38px; }.reference-dosha-track { height: 15px; }.reference-dosha-percent { font-size: 1.2rem; }.reference-chart-card, .reference-recent-card { min-height: auto; }.reference-chart { grid-template-columns: 26px 1fr; }.reference-axis, .reference-chart svg { height: 160px; }.reference-recent-row { grid-template-columns: 42px 1fr auto; gap: 8px; font-size: .76rem; }.reference-initials { width: 34px; height: 34px; }.reference-recent-row strong { gap: 5px; }.reference-recent-row i { width: 8px; height: 8px; } }
+
 img {
   display: block;
   max-width: 100%;
