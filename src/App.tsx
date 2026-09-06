@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CaptureScreen } from './components/CaptureScreen'
+import { DashboardGuard } from './components/DashboardGuard'
 import { AnalyticsScreen } from './components/AnalyticsScreen'
 import { RegistrationsScreen } from './components/RegistrationsScreen'
 import { LandingScreen } from './components/LandingScreen'
+import { LoginScreen } from './components/LoginScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
@@ -31,6 +33,7 @@ function readProgress(): { answers: QuizAnswers; currentQuestion: number } {
 export default function App() {
   const isAnalyticsRoute = window.location.pathname === '/painel'
   const isRegistrationsRoute = window.location.pathname === '/cadastros'
+  const isLoginRoute = window.location.pathname === '/login'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
   const [answers, setAnswers] = useState<QuizAnswers>(savedProgress.answers)
@@ -115,7 +118,7 @@ export default function App() {
 
   return (
     <main>
-      {isAnalyticsRoute ? <AnalyticsScreen /> : isRegistrationsRoute ? <RegistrationsScreen /> : <>
+      {isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen

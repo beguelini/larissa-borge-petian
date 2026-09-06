@@ -19,6 +19,7 @@ const doshaClass: Record<Dosha, string> = { vata: 'vata', pitta: 'pitta', kapha:
 
 function requestAnalytics() {
   return fetch('/api/analytics').then((response) => {
+    if (response.status === 401) window.location.assign('/login')
     if (!response.ok) throw new Error('Falha ao carregar o painel')
     return response.json() as Promise<Analytics>
   })
