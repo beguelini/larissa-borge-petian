@@ -1,6 +1,6 @@
-# Descubra seu dosha — Larissa Borge Petian
+# Descubra seu dosha — Larissa Petian
 
-Funil mobile-first de descoberta educativa de doshas para a Larissa Borge Petian. A experiência conduz a visitante por 15 perguntas, calcula a tendência predominante, registra o lead com consentimento LGPD e apresenta um ritual inicial antes da oferta do programa **Ritmo Essencial**.
+Funil mobile-first de descoberta educativa de doshas para a Larissa Petian. A experiência conduz a visitante por 15 perguntas, calcula a tendência predominante, registra o lead com consentimento LGPD e apresenta um ritual inicial antes da oferta do programa **Ritmo Essencial**.
 
 A identidade visual é totalmente tipográfica, complementada apenas por ilustrações vetoriais autorais em código. A aplicação não usa fotografias ou imagens geradas por IA.
 
