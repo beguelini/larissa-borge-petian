@@ -92,7 +92,7 @@ async function databaseRequest(path: string, init?: RequestInit) {
 
 export async function areDashboardCredentialsValidOrMigrated(username: string, password: string) {
   const normalizedUsername = normalizeDashboardUsername(username)
-  if (!normalizedUsername || !validDashboardPassword(password)) return false
+  if (!normalizedUsername || password.length === 0 || password.length > 256) return false
   const existingResponse = await databaseRequest(`?username=eq.${encodeURIComponent(normalizedUsername)}&select=username,password_hash,is_active&limit=1`)
   if (existingResponse?.ok) {
     const users = await existingResponse.json() as { password_hash: string; is_active: boolean }[]
@@ -103,6 +103,7 @@ export async function areDashboardCredentialsValidOrMigrated(username: string, p
   if (!configuredUsername || !configuredPassword) return false
   const matchesEnvironment = signaturesMatch(username, configuredUsername) && signaturesMatch(password, configuredPassword)
   if (!matchesEnvironment) return false
+  if (!validDashboardPassword(password)) return true
   const migrationResponse = await databaseRequest('', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ username: normalizedUsername, password_hash: hashDashboardPassword(password) }) })
   if (migrationResponse && !migrationResponse.ok && migrationResponse.status !== 409) console.error('Dashboard user migration failed', migrationResponse.status)
   return true
