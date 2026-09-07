@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 const cookieName = 'larissa_dashboard_session'
@@ -52,6 +52,60 @@ export function areDashboardCredentialsValid(username: string, password: string)
   const configuredPassword = process.env.DASHBOARD_PASSWORD
   if (!configuredUsername || !configuredPassword) return false
   return signaturesMatch(username, configuredUsername) && signaturesMatch(password, configuredPassword)
+}
+
+export function normalizeDashboardUsername(value: string) {
+  const username = value.trim().toLowerCase()
+  return /^[a-z0-9._-]{3,40}$/.test(username) ? username : null
+}
+
+export function validDashboardPassword(value: string) {
+  return value.length >= 10 && value.length <= 256
+}
+
+export function hashDashboardPassword(password: string) {
+  const salt = randomBytes(16).toString('hex')
+  const digest = scryptSync(password, salt, 64).toString('hex')
+  return `scrypt$${salt}$${digest}`
+}
+
+export function verifyDashboardPassword(password: string, stored: string) {
+  const [scheme, salt, digest] = stored.split('$')
+  if (scheme !== 'scrypt' || !salt || !digest) return false
+  const expected = Buffer.from(digest, 'hex')
+  const received = scryptSync(password, salt, 64)
+  return expected.length === received.length && timingSafeEqual(expected, received)
+}
+
+async function databaseRequest(path: string, init?: RequestInit) {
+  const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '')
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) return null
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/dashboard_users${path}`, {
+      ...init,
+      headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}`, ...(init?.headers ?? {}) },
+    })
+    return response
+  } catch { return null }
+}
+
+export async function areDashboardCredentialsValidOrMigrated(username: string, password: string) {
+  const normalizedUsername = normalizeDashboardUsername(username)
+  if (!normalizedUsername || !validDashboardPassword(password)) return false
+  const existingResponse = await databaseRequest(`?username=eq.${encodeURIComponent(normalizedUsername)}&select=username,password_hash,is_active&limit=1`)
+  if (existingResponse?.ok) {
+    const users = await existingResponse.json() as { password_hash: string; is_active: boolean }[]
+    if (users[0]) return users[0].is_active && verifyDashboardPassword(password, users[0].password_hash)
+  }
+  const configuredUsername = process.env.DASHBOARD_USERNAME
+  const configuredPassword = process.env.DASHBOARD_PASSWORD
+  if (!configuredUsername || !configuredPassword) return false
+  const matchesEnvironment = signaturesMatch(username, configuredUsername) && signaturesMatch(password, configuredPassword)
+  if (!matchesEnvironment) return false
+  const migrationResponse = await databaseRequest('', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ username: normalizedUsername, password_hash: hashDashboardPassword(password) }) })
+  if (migrationResponse && !migrationResponse.ok && migrationResponse.status !== 409) console.error('Dashboard user migration failed', migrationResponse.status)
+  return true
 }
 
 export function setDashboardSession(response: ServerResponse) {

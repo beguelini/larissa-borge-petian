@@ -4,6 +4,7 @@ import { DashboardGuard } from './components/DashboardGuard'
 import { AnalyticsScreen } from './components/AnalyticsScreen'
 import { RegistrationsScreen } from './components/RegistrationsScreen'
 import { DoshasScreen } from './components/DoshasScreen'
+import { SettingsScreen } from './components/SettingsScreen'
 import { LandingScreen } from './components/LandingScreen'
 import { LoginScreen } from './components/LoginScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
@@ -35,6 +36,7 @@ export default function App() {
   const isAnalyticsRoute = window.location.pathname === '/painel'
   const isRegistrationsRoute = window.location.pathname === '/cadastros'
   const isDoshasRoute = window.location.pathname === '/doshas'
+  const isSettingsRoute = window.location.pathname === '/configuracoes'
   const isLoginRoute = window.location.pathname === '/login'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
@@ -120,7 +122,7 @@ export default function App() {
 
   return (
     <main>
-      {isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : <>
+      {isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen
