@@ -1,7 +1,6 @@
-import { Clock3, Headphones, Info, NotebookPen, RotateCcw, Users, Waves } from 'lucide-react'
+import { Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
 import { FooterLogo } from './FooterLogo'
-import { RitmoEssencialDrawing } from './Illustrations'
 
 type ResultScreenProps = {
   firstName: string
@@ -152,32 +151,21 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
       </section>
 
       <section className="product-section">
-        <div className="shell product-grid">
+        <div className="shell product-action">
           <div className="product-copy">
-            <h2>Conhecer o seu ritmo é o começo. Sustentá-lo é a transformação.</h2>
-            <p>No Ritmo Essencial, Larissa guia você por 21 dias para observar, ajustar e sustentar uma rotina ayurvédica possível — com 10 a 15 minutos por dia.</p>
+            <h2>O seu resultado é o começo de uma nova forma de cuidar de você.</h2>
+            <p>No Meu Ritmo, você transforma essa leitura em pausas, escolhas e práticas possíveis para a sua vida real — com a orientação da Larissa, sem cobranças e sem fórmulas rígidas.</p>
           </div>
-          <div className="product-drawing" role="img" aria-label="Ilustração do caderno Ritmo Essencial e uma xícara de chá">
-            <RitmoEssencialDrawing />
-          </div>
-          <div className="product-proof" aria-label="O que está incluído">
-            <span><Headphones aria-hidden="true" /> 21 áudios</span>
-            <span><Waves aria-hidden="true" /> 3 práticas de yoga</span>
-            <span><NotebookPen aria-hidden="true" /> Caderno Meu Ritmo</span>
-            <span><Users aria-hidden="true" /> Encontro fechado</span>
-          </div>
-          <div className="product-action">
-            <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo</strong></p>
-            <a
-              className="product-button"
-              href={prelaunchWhatsAppUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Entrar no grupo do WhatsApp
-            </a>
-            <small>Receba as novidades e os próximos passos do lançamento.</small>
-          </div>
+          <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
+          <a
+            className="product-button"
+            href={prelaunchWhatsAppUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Quero entrar no pré-lançamento
+          </a>
+          <small>Entre no grupo do WhatsApp para receber os primeiros detalhes, condições especiais e ser avisada antes da abertura.</small>
         </div>
       </section>
       <FooterLogo />
