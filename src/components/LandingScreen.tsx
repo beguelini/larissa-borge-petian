@@ -11,16 +11,16 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
     <div className="landing-screen">
       <section className="hero shell">
         <div className="hero-copy">
-          <h1>Descubra o que o seu corpo vem tentando dizer</h1>
+          <h1>Entenda o que o seu corpo está pedindo para você se sentir mais leve</h1>
           <p>
-            Em poucos minutos, reconheça a energia que mais influencia o seu ritmo — e receba um
-            primeiro caminho para cuidar de você com mais leveza.
+            Seu corpo dá sinais todos os dias. Faça o teste de doshas gratuito e descubra um primeiro
+            caminho para cuidar de você com mais presença, gentileza e sentido.
           </p>
           <button className="primary-button" type="button" onClick={onStart}>
-            Descobrir meu dosha
+            Fazer meu teste gratuito
             <ArrowRight aria-hidden="true" size={20} strokeWidth={1.8} />
           </button>
-          <p className="trust-line">Leitura educativa • 3 minutos • Gratuito</p>
+          <p className="trust-line">É gratuito e leva cerca de 3 minutos.</p>
         </div>
         <BotanicalRhythm className="hero-drawing" />
       </section>
@@ -32,7 +32,7 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
         <div>
           <h2>O que você vai encontrar</h2>
           <p>
-            15 perguntas para entender sua energia em <strong>corpo, mente e rotina.</strong>
+            Em 15 perguntas simples, você entende melhor sua energia em <strong>corpo, mente e rotina.</strong>
           </p>
         </div>
       </section>
@@ -48,7 +48,7 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
         <div className="shell gentle-path-inner">
           <div>
             <h2>Um caminho prático e gentil para o seu dia a dia</h2>
-            <p>Sem regras rígidas. Sem fórmulas prontas. Apenas o que faz sentido para você.</p>
+            <p>Sem regras rígidas e sem fórmulas prontas. Apenas um cuidado que faz sentido para você.</p>
           </div>
           <BotanicalSprig className="gentle-drawing" />
         </div>
