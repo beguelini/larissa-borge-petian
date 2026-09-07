@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { areDashboardCredentialsValid, hasDashboardSession, setDashboardSession } from '../api/_lib/dashboard-auth'
+import { areDashboardCredentialsValid, hashDashboardPassword, hasDashboardSession, setDashboardSession, verifyDashboardPassword } from '../api/_lib/dashboard-auth'
 
 const previousPassword = process.env.DASHBOARD_PASSWORD
 const previousSecret = process.env.DASHBOARD_SESSION_SECRET
@@ -12,6 +12,13 @@ afterEach(() => {
   else delete process.env.DASHBOARD_SESSION_SECRET
   if (previousUsername) process.env.DASHBOARD_USERNAME = previousUsername
   else delete process.env.DASHBOARD_USERNAME
+})
+
+it('armazena senhas de usuários adicionais somente como hash scrypt', () => {
+  const hash = hashDashboardPassword('senha-de-teste-segura')
+  expect(hash).not.toContain('senha-de-teste-segura')
+  expect(verifyDashboardPassword('senha-de-teste-segura', hash)).toBe(true)
+  expect(verifyDashboardPassword('senha-incorreta', hash)).toBe(false)
 })
 
 describe('dashboard session', () => {

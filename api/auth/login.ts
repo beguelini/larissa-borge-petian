@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { areDashboardCredentialsValid, setDashboardSession } from '../_lib/dashboard-auth.js'
+import { areDashboardCredentialsValidOrMigrated, setDashboardSession } from '../_lib/dashboard-auth.js'
 
 async function readBody(request: IncomingMessage) {
   let body = ''
@@ -22,7 +22,7 @@ export default async function handler(request: IncomingMessage, response: Server
 
   try {
     const { username, password } = await readBody(request)
-    if (typeof username !== 'string' || typeof password !== 'string' || !areDashboardCredentialsValid(username, password)) {
+    if (typeof username !== 'string' || typeof password !== 'string' || !await areDashboardCredentialsValidOrMigrated(username, password)) {
       response.statusCode = 401
       response.end(JSON.stringify({ error: 'Senha inválida.' }))
       return

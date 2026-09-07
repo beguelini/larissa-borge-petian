@@ -1,15 +1,14 @@
-import { BarChart3, Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
+import { Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
 import { BotanicalSprig } from './Illustrations'
 
-type DashboardSection = 'panel' | 'registrations' | 'doshas'
+type DashboardSection = 'panel' | 'registrations' | 'doshas' | 'settings'
 
 export function DashboardSidebar({ active }: { active: DashboardSection }) {
   const items = [
     { label: 'Painel', icon: Home, href: '/painel', id: 'panel' },
     { label: 'Cadastros', icon: Users, href: '/cadastros', id: 'registrations' },
     { label: 'Doshas', icon: LineChart, href: '/doshas', id: 'doshas' },
-    { label: 'Relatórios', icon: BarChart3, href: '#relatorios', id: 'reports' },
-    { label: 'Configurações', icon: Settings, href: '#configuracoes', id: 'settings' },
+    { label: 'Configurações', icon: Settings, href: '/configuracoes', id: 'settings' },
   ]
 
   async function logout() {
