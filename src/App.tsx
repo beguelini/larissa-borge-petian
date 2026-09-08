@@ -8,6 +8,7 @@ import { SettingsScreen } from './components/SettingsScreen'
 import { LandingScreen } from './components/LandingScreen'
 import { LoginScreen } from './components/LoginScreen'
 import { MemberAccessScreen } from './components/MemberAccessScreen'
+import { EnrollmentScreen } from './components/EnrollmentScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
@@ -40,6 +41,7 @@ export default function App() {
   const isSettingsRoute = window.location.pathname === '/configuracoes'
   const isLoginRoute = window.location.pathname === '/login'
   const isMemberRoute = window.location.pathname === '/meu-ritmo'
+  const isEnrollmentRoute = window.location.pathname === '/inscricao'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
   const [answers, setAnswers] = useState<QuizAnswers>(savedProgress.answers)
@@ -124,7 +126,7 @@ export default function App() {
 
   return (
     <main>
-      {isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
+      {isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen

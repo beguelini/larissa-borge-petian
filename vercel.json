@@ -4,7 +4,8 @@
     { "source": "/cadastros", "destination": "/index.html" },
     { "source": "/doshas", "destination": "/index.html" },
     { "source": "/configuracoes", "destination": "/index.html" },
-    { "source": "/login", "destination": "/index.html" }
-    ,{ "source": "/meu-ritmo", "destination": "/index.html" }
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/inscricao", "destination": "/index.html" },
+    { "source": "/meu-ritmo", "destination": "/index.html" }
   ]
 }
