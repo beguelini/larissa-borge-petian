@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
 type Dosha = 'vata' | 'pitta' | 'kapha'
-type LeadRecord = { first_name: string; email: string; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }
+type LeadRecord = { id: string; first_name: string; email: string; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }
 
 const headers = { 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8', 'X-Content-Type-Options': 'nosniff' }
 
@@ -35,6 +35,7 @@ export function registrationResponse(leads: LeadRecord[], total: number, page: n
     page,
     pageSize,
     records: leads.map((lead) => ({
+      id: lead.id,
       firstName: lead.first_name,
       email: lead.email,
       initials: initials(lead.first_name),
@@ -49,8 +50,8 @@ export function registrationResponse(leads: LeadRecord[], total: number, page: n
 }
 
 export default async function handler(request: IncomingMessage, response: ServerResponse) {
-  if (request.method !== 'GET') {
-    response.setHeader('Allow', 'GET')
+  if (!['GET', 'DELETE'].includes(request.method ?? '')) {
+    response.setHeader('Allow', 'GET, DELETE')
     send(response, 405, { error: 'Método não permitido.' })
     return
   }
@@ -64,13 +65,24 @@ export default async function handler(request: IncomingMessage, response: Server
   }
 
   const requestUrl = new URL(request.url ?? '/', 'http://localhost')
+  if (request.method === 'DELETE') {
+    const id = requestUrl.searchParams.get('id')
+    if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) { send(response, 422, { error: 'Cadastro inválido.' }); return }
+    try {
+      const deleted = await fetch(`${supabaseUrl}/rest/v1/dosha_quiz_leads?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}`, Prefer: 'return=representation' } })
+      if (!deleted.ok) throw new Error('delete')
+      if (!(await deleted.json() as LeadRecord[]).length) { send(response, 404, { error: 'Cadastro não encontrado.' }); return }
+      send(response, 200, { ok: true })
+      return
+    } catch { send(response, 502, { error: 'Não foi possível excluir o cadastro.' }); return }
+  }
   const page = pageNumber(requestUrl.searchParams.get('page'))
   const requestedDosha = requestUrl.searchParams.get('dosha')
   const dosha = requestedDosha === 'vata' || requestedDosha === 'pitta' || requestedDosha === 'kapha' ? requestedDosha : null
   const requestedConsent = requestUrl.searchParams.get('marketing')
   const marketing = requestedConsent === 'true' || requestedConsent === 'false' ? requestedConsent : null
   const pageSize = 20
-  const params = new URLSearchParams({ select: 'first_name,email,dominant_dosha,secondary_dosha,is_balanced,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
+  const params = new URLSearchParams({ select: 'id,first_name,email,dominant_dosha,secondary_dosha,is_balanced,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
   if (dosha) params.set('dominant_dosha', `eq.${dosha}`)
   if (marketing) params.set('marketing_consent', `eq.${marketing}`)
 

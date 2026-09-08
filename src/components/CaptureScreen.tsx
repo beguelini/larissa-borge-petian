@@ -95,11 +95,12 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
           <label className="check-row">
             <input
               type="checkbox"
+              required
               checked={form.privacyConsent}
               onChange={(event) => setForm({ ...form, privacyConsent: event.target.checked })}
             />
             <span>
-              Concordo com o uso dos meus dados para receber este resultado, conforme a{' '}
+              <strong>Obrigatório:</strong> concordo com o uso dos meus dados para receber este resultado, conforme a{' '}
               <button type="button" className="inline-link" onClick={onOpenPrivacy}>Política de Privacidade</button>.
             </span>
           </label>

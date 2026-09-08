@@ -21,6 +21,9 @@
   --shell: min(100% - 36px, 1120px);
 }
 
+.hero-whatsapp-cta { display: inline-flex; align-items: center; gap: 7px; margin: 17px 2px 0; color: #315d38; font-size: .93rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.registration-delete { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #a74424; font: inherit; font-size: .83rem; cursor: pointer; }.registration-delete:disabled { cursor: wait; opacity: .6; }.registrations-row { grid-template-columns: 1.25fr 1.5fr .8fr 1fr .85fr .72fr; }
+
 * {
   box-sizing: border-box;
 }
