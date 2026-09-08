@@ -95,6 +95,30 @@ export function EnrollmentScreen() {
         </figure>
       </section>
 
+      <section className="enrollment-live-support" aria-labelledby="live-support-title">
+        <div className="shell">
+          <div className="enrollment-live-intro">
+            <p className="enrollment-kicker">Acompanhamento que aproxima</p>
+            <h2 id="live-support-title">Você não precisa atravessar essa mudança sozinha.</h2>
+            <p>Meu Ritmo não é apenas uma biblioteca de conteúdos. É um espaço para ser vista, compreendida e acompanhada enquanto transforma pequenas escolhas em uma rotina que realmente cabe na sua vida.</p>
+          </div>
+          <div className="enrollment-live-details">
+            <article>
+              <span>Ao vivo, a cada quinze dias</span>
+              <h3>Encontros com a Larissa para olhar para você, uma a uma.</h3>
+              <p>Traga suas dúvidas, seus desafios e o que está vivendo agora. Em cada encontro, Larissa conduz uma análise atenta das alunas, para que você encontre próximos passos mais claros e possíveis.</p>
+            </article>
+            <article className="enrollment-vip">
+              <span>Para quem deseja ir além</span>
+              <h3>Existe a possibilidade de um acompanhamento VIP.</h3>
+              <p>Um caminho mais próximo para mulheres que querem cultivar consistência, aprofundar o cuidado e construir uma mudança real na relação com a rotina e com o próprio corpo.</p>
+              <small>As vagas e condições do acompanhamento VIP são apresentadas às alunas quando disponíveis.</small>
+            </article>
+          </div>
+          <CheckoutButton className="enrollment-live-cta" />
+        </div>
+      </section>
+
       <section id="conteudo" className="enrollment-content shell">
         <p className="enrollment-kicker">O que está incluído</p>
         <h2>Tudo o que você precisa para viver o seu ritmo na prática.</h2>
