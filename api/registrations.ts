@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
 type Dosha = 'vata' | 'pitta' | 'kapha'
-type LeadRecord = { id: string; first_name: string; email: string; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }
+type LeadRecord = { id: string; first_name: string; email: string; whatsapp: string | null; dominant_dosha: Dosha; secondary_dosha: Dosha | null; is_balanced: boolean; marketing_consent: boolean; created_at: string }
 
 const headers = { 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8', 'X-Content-Type-Options': 'nosniff' }
 
@@ -38,6 +38,7 @@ export function registrationResponse(leads: LeadRecord[], total: number, page: n
       id: lead.id,
       firstName: lead.first_name,
       email: lead.email,
+      whatsapp: lead.whatsapp,
       initials: initials(lead.first_name),
       date: formatDate(lead.created_at),
       time: formatTime(lead.created_at),
@@ -82,7 +83,7 @@ export default async function handler(request: IncomingMessage, response: Server
   const requestedConsent = requestUrl.searchParams.get('marketing')
   const marketing = requestedConsent === 'true' || requestedConsent === 'false' ? requestedConsent : null
   const pageSize = 20
-  const params = new URLSearchParams({ select: 'id,first_name,email,dominant_dosha,secondary_dosha,is_balanced,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
+  const params = new URLSearchParams({ select: 'id,first_name,email,whatsapp,dominant_dosha,secondary_dosha,is_balanced,marketing_consent,created_at', order: 'created_at.desc', limit: String(pageSize), offset: String((page - 1) * pageSize) })
   if (dosha) params.set('dominant_dosha', `eq.${dosha}`)
   if (marketing) params.set('marketing_consent', `eq.${marketing}`)
 

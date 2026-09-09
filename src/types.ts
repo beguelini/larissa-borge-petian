@@ -28,6 +28,7 @@ export type QuizResult = {
 export type LeadFormData = {
   firstName: string
   email: string
+  whatsapp: string
   privacyConsent: boolean
   marketingConsent: boolean
   website: string

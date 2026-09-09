@@ -733,6 +733,7 @@ img {
 
 .lead-form input[type='text'],
 .lead-form input[type='email'],
+.lead-form input[type='tel'],
 .lead-form input:not([type]) {
   width: 100%;
   min-height: 58px;

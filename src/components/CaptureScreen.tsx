@@ -12,9 +12,23 @@ type CaptureScreenProps = {
 const initialForm: LeadFormData = {
   firstName: '',
   email: '',
+  whatsapp: '',
   privacyConsent: false,
   marketingConsent: false,
   website: '',
+}
+
+function formatWhatsApp(value: string) {
+  const digits = value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '').slice(0, 11)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+function validWhatsApp(value: string) {
+  const digits = value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '')
+  return /^[1-9]\d(?:9?\d{8})$/.test(digits)
 }
 
 export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreenProps) {
@@ -34,6 +48,10 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
       setError('Digite um e-mail válido para abrir o seu resultado.')
       return
     }
+    if (!validWhatsApp(form.whatsapp)) {
+      setError('Digite um WhatsApp válido para abrir o seu resultado.')
+      return
+    }
     if (!form.privacyConsent) {
       setError('Você precisa concordar com a Política de Privacidade para continuar.')
       return
@@ -44,7 +62,7 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
     }
 
     setSubmitting(true)
-    await onSubmit({ ...form, firstName: form.firstName.trim(), email: form.email.trim().toLowerCase() })
+    await onSubmit({ ...form, firstName: form.firstName.trim(), email: form.email.trim().toLowerCase(), whatsapp: form.whatsapp.replace(/\D/g, '') })
     setSubmitting(false)
   }
 
@@ -83,6 +101,19 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
               placeholder="voce@email.com"
               value={form.email}
               onChange={(event) => setForm({ ...form, email: event.target.value })}
+            />
+          </label>
+          <label>
+            <span>Seu WhatsApp</span>
+            <input
+              name="whatsapp"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="(11) 99999-9999"
+              value={form.whatsapp}
+              onChange={(event) => setForm({ ...form, whatsapp: formatWhatsApp(event.target.value) })}
+              required
             />
           </label>
           <label className="honeypot" aria-hidden="true">
