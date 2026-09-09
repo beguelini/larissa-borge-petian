@@ -69,4 +69,20 @@ describe('POST /api/hotmart-webhook', () => {
     expect(String(message.html)).toContain('Criar minha senha e acessar')
     expect(String(message.html)).toContain('activation=')
   })
+
+  it('reconhece o teste sandbox da Hotmart sem criar uma aluna fictícia', async () => {
+    process.env.HOTMART_HOTTOK = 'hotmart-test-token'
+    process.env.HOTMART_PRODUCT_ID = '12345'
+    process.env.SUPABASE_URL = 'https://project.supabase.co'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+    const res = response()
+    const sandbox = { ...approvedPurchase, data: { ...approvedPurchase.data, product: { id: 0, sku: 'HTM_SANDBOX' } } }
+
+    await handler(request(sandbox), res as never)
+
+    expect(res.statusCode).toBe(200)
+    expect(JSON.parse(res.body)).toEqual({ ok: true, test: true })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
 })
