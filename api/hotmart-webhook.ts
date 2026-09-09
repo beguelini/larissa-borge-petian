@@ -4,7 +4,7 @@ import { createActivationToken } from './_lib/member-activation.js'
 import { email, hashMemberPassword } from './_lib/member-auth.js'
 import { sendMemberWelcomeEmail } from './lib/member-welcome-email.js'
 
-type PurchaseWebhook = { id?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown }; purchase?: { transaction?: unknown; status?: unknown } } }
+type PurchaseWebhook = { id?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown }; purchase?: { transaction?: unknown; status?: unknown } } }
 const send = (res: ServerResponse, status: number, body: Record<string, unknown>) => { res.statusCode = status; res.setHeader('Cache-Control', 'no-store'); res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)) }
 const db = () => { const url = process.env.SUPABASE_URL?.replace(/\/$/, ''); const key = process.env.SUPABASE_SERVICE_ROLE_KEY; return url && key ? { url, key } : null }
 const matches = (received: string, expected: string) => { const a = Buffer.from(received); const b = Buffer.from(expected); return a.length === b.length && timingSafeEqual(a, b) }
@@ -26,6 +26,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     const payload = await readBody(req)
     if (payload.event !== 'PURCHASE_APPROVED' || payload.version !== '2.0.0' || payload.data?.purchase?.status !== 'APPROVED') return send(res, 200, { ok: true, ignored: true })
+    if (payload.data.product?.id === 0 && payload.data.product.sku === 'HTM_SANDBOX') return send(res, 200, { ok: true, test: true })
     const eventId = asText(payload.id)
     const transaction = asText(payload.data.purchase.transaction)
     const buyerEmail = email(asText(payload.data.buyer?.email) ?? '')
