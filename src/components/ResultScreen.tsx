@@ -1,4 +1,4 @@
-import { Clock3, Info, RotateCcw } from 'lucide-react'
+import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
 import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
 import { FooterLogo } from './FooterLogo'
@@ -96,6 +96,17 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
           <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
           <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero entrar no pré-lançamento</a>
           <small>Entre no grupo do WhatsApp para receber os primeiros detalhes, condições especiais e ser avisada antes da abertura.</small>
+        </div>
+      </section>
+      <section className="result-authority" aria-label="Conheça Larissa Petian">
+        <div className="shell result-authority-inner">
+          <img src="/post-biografia.png" alt="Larissa Petian, professora de Hatha e Vinyasa Yoga e terapeuta Ayurveda" />
+          <div>
+            <p className="authority-kicker">Seu cuidado pode continuar</p>
+            <h2>Conte com a Larissa nessa jornada.</h2>
+            <p>Receba inspirações, práticas possíveis e conversas sobre Ayurveda para tornar o cuidado com você uma parte real da sua rotina.</p>
+            <a className="instagram-result-link" href="https://www.instagram.com/larissapetian/" target="_blank" rel="noreferrer"><Camera aria-hidden="true" size={19} /> Seguir @larissapetian <ArrowUpRight aria-hidden="true" size={17} /></a>
+          </div>
         </div>
       </section>
       <FooterLogo />

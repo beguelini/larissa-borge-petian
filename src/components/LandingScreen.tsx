@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, ClipboardCheck } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Camera, ClipboardCheck } from 'lucide-react'
 import { BotanicalRhythm, BotanicalSprig } from './Illustrations'
 import { FooterLogo } from './FooterLogo'
 
@@ -51,6 +51,17 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
             <p>Sem regras rígidas e sem fórmulas prontas. Apenas um cuidado que faz sentido para você.</p>
           </div>
           <BotanicalSprig className="gentle-drawing" />
+        </div>
+      </section>
+
+      <section className="instagram-home" aria-label="Instagram da Larissa Petian">
+        <div className="shell instagram-home-inner">
+          <span className="instagram-mark" aria-hidden="true"><Camera size={21} strokeWidth={1.7} /></span>
+          <div>
+            <p>Ayurveda para vida real, todos os dias</p>
+            <h2>Acompanhe a Larissa no Instagram.</h2>
+          </div>
+          <a href="https://www.instagram.com/larissapetian/" target="_blank" rel="noreferrer">Seguir @larissapetian <ArrowUpRight aria-hidden="true" size={17} /></a>
         </div>
       </section>
 
