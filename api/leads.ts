@@ -132,6 +132,8 @@ export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
         email: payload.email.trim().toLowerCase(),
         primary: result.primary,
         secondary: result.secondary,
+        isBalanced: result.isBalanced,
+        percentages: result.percentages,
       })
       if (!emailResult.sent && emailResult.reason !== 'not_configured') {
         console.error('Resend result email failed', emailResult.reason)

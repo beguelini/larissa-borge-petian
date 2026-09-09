@@ -25,7 +25,7 @@ export function PrivacyPolicy({ onClose }: PrivacyPolicyProps) {
         <p>Nome, e-mail, respostas e resultado do questionário, consentimentos e informações básicas de origem da visita.</p>
 
         <h2>Para que usamos</h2>
-        <p>Para liberar sua leitura, entender o interesse no conteúdo da Larissa e, somente se você autorizar separadamente, enviar conteúdos e novidades por e-mail.</p>
+        <p>Para liberar sua leitura, entender o interesse no conteúdo da Larissa e enviar o resultado, conteúdos e novidades por e-mail conforme o aceite informado no cadastro.</p>
 
         <h2>Com quem compartilhamos</h2>
         <p>Os dados são processados pela infraestrutura da Vercel e armazenados no Supabase. Não vendemos seus dados.</p>

@@ -21,7 +21,6 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
             <ArrowRight aria-hidden="true" size={20} strokeWidth={1.8} />
           </button>
           <p className="trust-line">É gratuito e leva cerca de 3 minutos.</p>
-          <a className="hero-whatsapp-cta" href="https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t" target="_blank" rel="noreferrer">Entrar no grupo de pré-lançamento no WhatsApp <ArrowUpRight aria-hidden="true" size={18} /></a>
         </div>
         <BotanicalRhythm className="hero-drawing" />
       </section>

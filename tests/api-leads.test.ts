@@ -92,6 +92,9 @@ describe('POST /api/leads', () => {
     const message = JSON.parse(String(request.mock.calls[1][1]?.body)) as Record<string, unknown>
     expect(message.to).toEqual(['ana@example.com'])
     expect(message.subject).toBe('Seu resultado dosha está pronto, Ana')
+    expect(String(message.html)).toContain('O que isso pode revelar')
+    expect(String(message.html)).toContain('Entrar no grupo de pré-lançamento')
+    expect(String(message.html)).toContain('https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t')
   })
 
   it('mantém o cadastro mesmo se o envio de e-mail falhar', async () => {
@@ -115,10 +118,20 @@ describe('POST /api/leads', () => {
   })
 
   it('monta o conteúdo do resultado sem injetar o nome informado', () => {
-    const email = createDoshaResultEmail({ firstName: '<Ana>', email: 'ana@example.com', primary: 'vata', secondary: 'pitta' })
+    const email = createDoshaResultEmail({
+      firstName: '<Ana>',
+      email: 'ana@example.com',
+      primary: 'vata',
+      secondary: 'pitta',
+      isBalanced: false,
+      percentages: { vata: 60, pitta: 33, kapha: 7 },
+    })
 
     expect(email.subject).toBe('Seu resultado dosha está pronto, <Ana>')
     expect(email.html).toContain('&lt;Ana&gt;')
     expect(email.html).toContain('Vata com traços de Pitta')
+    expect(email.html).toContain('Criatividade, movimento e sensibilidade aparecem com força no seu jeito de viver.')
+    expect(email.html).toContain('Antes de começar o dia, aqueça as mãos')
+    expect(email.text).toContain('Kapha: 7%')
   })
 })
