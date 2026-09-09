@@ -1,5 +1,6 @@
 import { Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
+import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
 import { FooterLogo } from './FooterLogo'
 
 type ResultScreenProps = {
@@ -8,50 +9,6 @@ type ResultScreenProps = {
   saveWarning: boolean
   onRestart: () => void
 }
-
-const doshaName: Record<Dosha, string> = {
-  vata: 'Vata',
-  pitta: 'Pitta',
-  kapha: 'Kapha',
-}
-
-const doshaEssence: Record<Dosha, string> = {
-  vata: 'leveza',
-  pitta: 'força',
-  kapha: 'estabilidade',
-}
-
-const resultContent: Record<Dosha, { support: string; insights: string[]; ritual: string }> = {
-  vata: {
-    support: 'Criatividade, movimento e sensibilidade aparecem com força no seu jeito de viver.',
-    insights: [
-      'Você tende a perceber possibilidades e responder com rapidez.',
-      'O excesso de estímulos pode espalhar sua energia ao longo do dia.',
-      'Regularidade e acolhimento ajudam a devolver presença ao seu ritmo.',
-    ],
-    ritual: 'Antes de começar o dia, aqueça as mãos, apoie-as sobre o peito e faça 6 respirações longas. Depois, escolha apenas uma prioridade.',
-  },
-  pitta: {
-    support: 'Clareza, intensidade e direção aparecem com força no seu jeito de viver.',
-    insights: [
-      'Você tende a agir com foco e rapidez.',
-      'A exigência pode crescer quando algo foge do plano.',
-      'Pausas simples ajudam a devolver espaço ao seu dia.',
-    ],
-    ritual: 'Antes da próxima tarefa, pare por 3 minutos. Solte os ombros, respire devagar e escolha uma única prioridade.',
-  },
-  kapha: {
-    support: 'Constância, acolhimento e resistência aparecem com força no seu jeito de viver.',
-    insights: [
-      'Você tende a construir vínculos e sustentar o que começa.',
-      'Mudanças bruscas podem despertar resistência ou sensação de peso.',
-      'Movimento gentil ajuda a renovar sua energia sem romper seu ritmo.',
-    ],
-    ritual: 'Abra a janela, coloque uma música leve e mova o corpo por 3 minutos. Depois, comece pela menor ação que tira seu dia da inércia.',
-  },
-}
-
-const prelaunchWhatsAppUrl = 'https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t'
 
 function ScoreRings({ result }: { result: QuizResult }) {
   const rings: { dosha: Dosha; radius: number; color: string }[] = [
@@ -69,16 +26,7 @@ function ScoreRings({ result }: { result: QuizResult }) {
           return (
             <g key={dosha} transform="rotate(-90 65 65)">
               <circle cx="65" cy="65" r={radius} className="ring-track" />
-              <circle
-                cx="65"
-                cy="65"
-                r={radius}
-                fill="none"
-                stroke={color}
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${(value / 100) * circumference} ${circumference}`}
-              />
+              <circle cx="65" cy="65" r={radius} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(value / 100) * circumference} ${circumference}`} />
             </g>
           )
         })}
@@ -97,14 +45,7 @@ function ScoreRings({ result }: { result: QuizResult }) {
 }
 
 export function ResultScreen({ firstName, result, saveWarning, onRestart }: ResultScreenProps) {
-  const content = resultContent[result.primary]
-  const secondaryText = result.secondary
-    ? ` com traços de ${doshaName[result.secondary]}`
-    : ''
-
-  const headline = result.isBalanced
-    ? 'Seu ritmo reúne as três forças'
-    : `Seu ritmo tem a ${doshaEssence[result.primary]} de ${doshaName[result.primary]}`
+  const reading = getDoshaResultReading(result)
 
   return (
     <div className="result-screen">
@@ -117,8 +58,8 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
       <section className="result-hero shell">
         <div className="result-heading">
           {firstName && <p className="personal-greeting">{firstName}, esta é a sua leitura.</p>}
-          <h1>{headline}{secondaryText}</h1>
-          <p>{result.isBalanced ? 'Movimento, intensidade e estabilidade aparecem de forma próxima no seu jeito de viver.' : content.support}</p>
+          <h1>{reading.headline}{reading.secondaryText}</h1>
+          <p>{reading.summary}</p>
         </div>
         <ScoreRings result={result} />
       </section>
@@ -126,7 +67,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
       <section className="insights shell">
         <h2>O que isso pode revelar</h2>
         <div className="insight-list">
-          {content.insights.map((insight, index) => (
+          {reading.content.insights.map((insight, index) => (
             <div className="insight-row" key={insight}>
               <span aria-hidden="true">0{index + 1}</span>
               <p>{insight}</p>
@@ -138,16 +79,12 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
           <Clock3 aria-hidden="true" size={40} strokeWidth={1.4} />
           <div>
             <h2>Seu primeiro ritual</h2>
-            <p>{content.ritual}</p>
+            <p>{reading.content.ritual}</p>
           </div>
         </div>
 
         <p className="education-note"><Info aria-hidden="true" size={17} /> Esta é uma leitura educativa de autoconhecimento, não um diagnóstico.</p>
-        {saveWarning && (
-          <p className="save-warning" role="status">
-            Seu resultado foi aberto, mas não conseguimos registrar seus dados agora. Tente novamente mais tarde para entrar na lista da Larissa.
-          </p>
-        )}
+        {saveWarning && <p className="save-warning" role="status">Seu resultado foi aberto, mas não conseguimos registrar seus dados agora. Tente novamente mais tarde para entrar na lista da Larissa.</p>}
       </section>
 
       <section className="product-section">
@@ -157,14 +94,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
             <p>No Meu Ritmo, você transforma essa leitura em pausas, escolhas e práticas possíveis para a sua vida real — com a orientação da Larissa, sem cobranças e sem fórmulas rígidas.</p>
           </div>
           <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
-          <a
-            className="product-button"
-            href={prelaunchWhatsAppUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Quero entrar no pré-lançamento
-          </a>
+          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero entrar no pré-lançamento</a>
           <small>Entre no grupo do WhatsApp para receber os primeiros detalhes, condições especiais e ser avisada antes da abertura.</small>
         </div>
       </section>
