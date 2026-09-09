@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { sendDoshaResultEmail } from './lib/dosha-result-email.js'
 import { hasCompleteAnswers, scoreQuiz } from '../src/lib/results.js'
 import type { QuizAnswers } from '../src/types.js'
 
@@ -81,7 +82,7 @@ export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
   if (!validName(payload.firstName) || !validEmail(payload.email)) {
     return { status: 422, body: { error: 'Nome ou e-mail inválido.' } }
   }
-  if (payload.privacyConsent !== true || typeof payload.marketingConsent !== 'boolean') {
+  if (payload.privacyConsent !== true || payload.marketingConsent !== true) {
     return { status: 422, body: { error: 'Consentimentos inválidos.' } }
   }
   if (!isRecord(payload.answers) || !hasCompleteAnswers(payload.answers as QuizAnswers)) {
@@ -122,6 +123,22 @@ export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
   if (!insertResponse.ok) {
     console.error('Supabase lead insert failed', insertResponse.status)
     return { status: 502, body: { error: 'Não foi possível registrar o resultado.' } }
+  }
+
+  if (payload.marketingConsent === true) {
+    try {
+      const emailResult = await sendDoshaResultEmail({
+        firstName: payload.firstName.trim(),
+        email: payload.email.trim().toLowerCase(),
+        primary: result.primary,
+        secondary: result.secondary,
+      })
+      if (!emailResult.sent && emailResult.reason !== 'not_configured') {
+        console.error('Resend result email failed', emailResult.reason)
+      }
+    } catch {
+      console.error('Resend result email failed unexpectedly')
+    }
   }
 
   return { status: 201, body: { ok: true } }

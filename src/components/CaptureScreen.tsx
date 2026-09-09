@@ -38,6 +38,10 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
       setError('Você precisa concordar com a Política de Privacidade para continuar.')
       return
     }
+    if (!form.marketingConsent) {
+      setError('Autorize o envio de e-mails da Larissa para receber o seu resultado.')
+      return
+    }
 
     setSubmitting(true)
     await onSubmit({ ...form, firstName: form.firstName.trim(), email: form.email.trim().toLowerCase() })
@@ -107,10 +111,11 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
           <label className="check-row">
             <input
               type="checkbox"
+              required
               checked={form.marketingConsent}
               onChange={(event) => setForm({ ...form, marketingConsent: event.target.checked })}
             />
-            <span>Quero receber conteúdos e novidades da Larissa por e-mail.</span>
+            <span><strong>Obrigatório:</strong> autorizo receber por e-mail meu resultado e conteúdos, novidades e convites da Larissa.</span>
           </label>
 
           {error && <p className="form-error" role="alert">{error}</p>}
@@ -119,7 +124,7 @@ export function CaptureScreen({ onSubmit, onBack, onOpenPrivacy }: CaptureScreen
           </button>
         </form>
 
-        <p className="secure-note"><ShieldCheck aria-hidden="true" size={22} /> Seus dados ficam protegidos. Você pode sair da lista quando quiser.</p>
+        <p className="secure-note"><ShieldCheck aria-hidden="true" size={22} /> Seus dados ficam protegidos e serão usados conforme a Política de Privacidade.</p>
         <button className="back-button capture-back" type="button" onClick={onBack}>
           <ArrowLeft aria-hidden="true" size={21} /> Voltar à última pergunta
         </button>
