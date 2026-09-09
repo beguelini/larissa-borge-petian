@@ -21,6 +21,12 @@
   --shell: min(100% - 36px, 1120px);
 }
 
+.finance-kicker { margin: 0 0 8px; color: var(--clay); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.finance-source { display:flex; align-items:center; gap:7px; margin-top:13px; color:#607060; font-size:.78rem; }.hotmart-logo { display:grid; place-items:center; width:19px; height:19px; border-radius:5px; background:#f04f23; color:#fff; font-weight:800; font-size:.73rem; }
+.finance-grid { display:grid; grid-template-columns:1.25fr .75fr; gap:20px; margin-top:20px; }.finance-products { display:grid; margin-top:17px; }.finance-products article { min-height:62px; display:flex; align-items:center; justify-content:space-between; gap:18px; border-bottom:1px solid #e6e2dc; }.finance-products article div { display:grid; gap:4px; }.finance-products strong { color:#244434; font-size:.94rem; }.finance-products b { color:#315d38; font-family:var(--serif); font-size:1.35rem; font-weight:400; text-align:right; }.finance-products small { color:#697568; font-size:.76rem; }.finance-products b.is-negative { color:#bc593b; }
+.finance-bars { min-height:210px; display:flex; align-items:end; gap:9px; margin-top:22px; padding:8px 0 22px; border-bottom:1px solid #e5e3dc; }.finance-bars > div { min-width:20px; height:174px; flex:1; display:flex; flex-direction:column; justify-content:end; align-items:center; gap:8px; }.finance-bars span { display:block; width:min(100%,26px); border-radius:5px 5px 2px 2px; background:#587b48; }.finance-bars small { color:#687168; font-size:.65rem; white-space:nowrap; }.finance-bars .reference-empty { align-self:center; }
+@media(max-width:980px){.finance-grid{grid-template-columns:1fr}}@media(max-width:620px){.finance-products b{font-size:1.15rem}.finance-bars{gap:5px}.finance-bars > div:nth-child(n+10){display:none}}
+
 .registration-delete { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: #a74424; font: inherit; font-size: .83rem; cursor: pointer; }.registration-delete:disabled { cursor: wait; opacity: .6; }.registrations-row { grid-template-columns: 1.25fr 1.5fr .8fr 1fr .85fr .72fr; }
 
 * {

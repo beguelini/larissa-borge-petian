@@ -6,6 +6,7 @@
     { "source": "/configuracoes", "destination": "/index.html" },
     { "source": "/login", "destination": "/index.html" },
     { "source": "/inscricao", "destination": "/index.html" },
-    { "source": "/meu-ritmo", "destination": "/index.html" }
+    { "source": "/meu-ritmo", "destination": "/index.html" },
+    { "source": "/faturamento-hotmart", "destination": "/index.html" }
   ]
 }

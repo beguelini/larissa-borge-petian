@@ -9,6 +9,7 @@ import { LandingScreen } from './components/LandingScreen'
 import { LoginScreen } from './components/LoginScreen'
 import { MemberAccessScreen } from './components/MemberAccessScreen'
 import { EnrollmentScreen } from './components/EnrollmentScreen'
+import { HotmartFinanceScreen } from './components/HotmartFinanceScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
@@ -42,6 +43,7 @@ export default function App() {
   const isLoginRoute = window.location.pathname === '/login'
   const isMemberRoute = window.location.pathname === '/meu-ritmo'
   const isEnrollmentRoute = window.location.pathname === '/inscricao'
+  const isHotmartFinanceRoute = window.location.pathname === '/faturamento-hotmart'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
   const [answers, setAnswers] = useState<QuizAnswers>(savedProgress.answers)
@@ -126,7 +128,7 @@ export default function App() {
 
   return (
     <main>
-      {isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
+      {isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isHotmartFinanceRoute ? <DashboardGuard><HotmartFinanceScreen /></DashboardGuard> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen
