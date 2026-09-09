@@ -4,7 +4,7 @@ import { createActivationToken } from './_lib/member-activation.js'
 import { email, hashMemberPassword } from './_lib/member-auth.js'
 import { sendMemberWelcomeEmail } from './lib/member-welcome-email.js'
 
-type PurchaseWebhook = { id?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown }; purchase?: { transaction?: unknown; status?: unknown } } }
+type PurchaseWebhook = { id?: unknown; creation_date?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown; name?: unknown }; purchase?: { transaction?: unknown; status?: unknown; price?: { value?: unknown; currency_value?: unknown }; payment?: { type?: unknown } } } }
 const send = (res: ServerResponse, status: number, body: Record<string, unknown>) => { res.statusCode = status; res.setHeader('Cache-Control', 'no-store'); res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)) }
 const db = () => { const url = process.env.SUPABASE_URL?.replace(/\/$/, ''); const key = process.env.SUPABASE_SERVICE_ROLE_KEY; return url && key ? { url, key } : null }
 const matches = (received: string, expected: string) => { const a = Buffer.from(received); const b = Buffer.from(expected); return a.length === b.length && timingSafeEqual(a, b) }
@@ -25,20 +25,28 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   let processedEventId: string | null = null
   try {
     const payload = await readBody(req)
-    if (payload.event !== 'PURCHASE_APPROVED' || payload.version !== '2.0.0' || payload.data?.purchase?.status !== 'APPROVED') return send(res, 200, { ok: true, ignored: true })
-    if (payload.data.product?.id === 0 && payload.data.product.sku === 'HTM_SANDBOX') return send(res, 200, { ok: true, test: true })
+    if (!['PURCHASE_APPROVED', 'PURCHASE_REFUNDED', 'PURCHASE_CHARGEBACK', 'PURCHASE_CANCELED'].includes(String(payload.event)) || payload.version !== '2.0.0') return send(res, 200, { ok: true, ignored: true })
+    if (payload.data?.product?.id === 0 && payload.data.product.sku === 'HTM_SANDBOX') return send(res, 200, { ok: true, test: true })
+    const data = payload.data
+    if (!data?.purchase) return send(res, 422, { error: 'Dados da compra inválidos.' })
     const eventId = asText(payload.id)
-    const transaction = asText(payload.data.purchase.transaction)
-    const buyerEmail = email(asText(payload.data.buyer?.email) ?? '')
-    const buyerName = asText(payload.data.buyer?.name, 100)
-    const receivedProductId = payload.data.product?.id
-    if (!eventId || !transaction || !buyerEmail || !buyerName || String(receivedProductId) !== productId) return send(res, 422, { error: 'Dados da compra inválidos.' })
+    const transaction = asText(data.purchase.transaction)
+    const buyerEmail = email(asText(data.buyer?.email) ?? '')
+    const buyerName = asText(data.buyer?.name, 100)
+    const receivedProductId = data.product?.id
+    const productName = asText(data.product?.name, 160)
+    const currency = asText(data.purchase.price?.currency_value, 8)
+    const paymentType = asText(data.purchase.payment?.type, 40)
+    const grossAmount = typeof data.purchase.price?.value === 'number' && Number.isFinite(data.purchase.price.value) ? data.purchase.price.value : null
+    const createdAt = typeof payload.creation_date === 'number' && Number.isFinite(payload.creation_date) ? new Date(payload.creation_date).toISOString() : new Date().toISOString()
+    if (!eventId || !transaction || !buyerEmail || !productName || grossAmount === null) return send(res, 422, { error: 'Dados da compra inválidos.' })
 
-    const eventResponse = await fetch(`${connection.url}/rest/v1/hotmart_webhook_events`, { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ hotmart_event_id: eventId, transaction_code: transaction, event_type: payload.event, buyer_email: buyerEmail, product_id: productId }) })
+    const eventResponse = await fetch(`${connection.url}/rest/v1/hotmart_webhook_events`, { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ hotmart_event_id: eventId, transaction_code: transaction, event_type: payload.event, buyer_email: buyerEmail, product_id: String(receivedProductId ?? ''), product_name: productName, event_created_at: createdAt, purchase_status: asText(data.purchase.status, 32), gross_amount: grossAmount, currency, payment_type: paymentType }) })
     if (eventResponse.status === 409) return send(res, 200, { ok: true, duplicate: true })
     if (!eventResponse.ok) throw new Error('event')
     processedEventId = eventId
 
+    if (payload.event !== 'PURCHASE_APPROVED' || data.purchase.status !== 'APPROVED' || !buyerName || String(receivedProductId) !== productId) return send(res, 200, { ok: true })
     const activation = createActivationToken()
     const now = new Date()
     const accountResponse = await fetch(`${connection.url}/rest/v1/member_accounts?email=eq.${encodeURIComponent(buyerEmail)}&select=id&limit=1`, { headers })

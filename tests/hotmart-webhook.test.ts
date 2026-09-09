@@ -19,7 +19,7 @@ const approvedPurchase = {
   id: 'event-123',
   event: 'PURCHASE_APPROVED',
   version: '2.0.0',
-  data: { product: { id: 12345 }, buyer: { name: 'Ana Silva', email: 'ana@example.com' }, purchase: { transaction: 'HP123', status: 'APPROVED' } },
+  data: { product: { id: 12345, name: 'Meu Ritmo' }, buyer: { name: 'Ana Silva', email: 'ana@example.com' }, purchase: { transaction: 'HP123', status: 'APPROVED', price: { value: 297, currency_value: 'BRL' }, payment: { type: 'PIX' } } },
 }
 
 afterEach(() => {
