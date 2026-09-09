@@ -23,6 +23,7 @@ describe('POST /api/leads', () => {
     const response = await handleLeadPayload({
       firstName: 'Teste',
       email: 'qa@example.com',
+      whatsapp: '11999999999',
       privacyConsent: true,
       marketingConsent: true,
       answers: { 'body-frame': 'opcao-inexistente' },
@@ -37,6 +38,7 @@ describe('POST /api/leads', () => {
     const response = await handleLeadPayload({
       firstName: 'Teste',
       email: 'qa@example.com',
+      whatsapp: '11999999999',
       privacyConsent: true,
       marketingConsent: false,
       answers: completeAnswers(),
@@ -54,6 +56,7 @@ describe('POST /api/leads', () => {
     const response = await handleLeadPayload({
       firstName: 'Teste',
       email: 'QA@Example.com',
+      whatsapp: '(11) 99999-9999',
       privacyConsent: true,
       marketingConsent: true,
       answers: completeAnswers(),
@@ -65,6 +68,7 @@ describe('POST /api/leads', () => {
     const [, init] = databaseFetch.mock.calls[0]
     const inserted = JSON.parse(String(init?.body)) as Record<string, unknown>
     expect(inserted.email).toBe('qa@example.com')
+    expect(inserted.whatsapp).toBe('5511999999999')
     expect(inserted.privacy_consent).toBe(true)
     expect(inserted.scores).toEqual({ vata: 5, pitta: 5, kapha: 5 })
   })
@@ -81,6 +85,7 @@ describe('POST /api/leads', () => {
     const response = await handleLeadPayload({
       firstName: 'Ana',
       email: 'ana@example.com',
+      whatsapp: '11999999999',
       privacyConsent: true,
       marketingConsent: true,
       answers: completeAnswers(),
@@ -93,7 +98,7 @@ describe('POST /api/leads', () => {
     expect(message.to).toEqual(['ana@example.com'])
     expect(message.subject).toBe('Seu resultado dosha está pronto, Ana')
     expect(String(message.html)).toContain('O que isso pode revelar')
-    expect(String(message.html)).toContain('Entrar no grupo de pré-lançamento')
+    expect(String(message.html)).toContain('Quero transformar meu ritmo com a Larissa')
     expect(String(message.html)).toContain('https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t')
   })
 
@@ -109,6 +114,7 @@ describe('POST /api/leads', () => {
     const response = await handleLeadPayload({
       firstName: 'Ana',
       email: 'ana@example.com',
+      whatsapp: '11999999999',
       privacyConsent: true,
       marketingConsent: true,
       answers: completeAnswers(),
@@ -136,5 +142,19 @@ describe('POST /api/leads', () => {
     expect(email.html).toContain('width="600"')
     expect(email.html).toContain('mso-table-lspace:0pt')
     expect(email.text).toContain('Kapha: 7%')
+  })
+
+  it('rejeita o cadastro sem WhatsApp antes de acessar o banco', async () => {
+    const databaseFetch = vi.spyOn(globalThis, 'fetch')
+    const response = await handleLeadPayload({
+      firstName: 'Teste',
+      email: 'qa@example.com',
+      privacyConsent: true,
+      marketingConsent: true,
+      answers: completeAnswers(),
+    })
+
+    expect(response.status).toBe(422)
+    expect(databaseFetch).not.toHaveBeenCalled()
   })
 })

@@ -22,7 +22,7 @@ export function PrivacyPolicy({ onClose }: PrivacyPolicyProps) {
         <p>Última atualização: 27 de agosto de 2026.</p>
 
         <h2>Quais dados usamos</h2>
-        <p>Nome, e-mail, respostas e resultado do questionário, consentimentos e informações básicas de origem da visita.</p>
+        <p>Nome, e-mail, WhatsApp, respostas e resultado do questionário, consentimentos e informações básicas de origem da visita.</p>
 
         <h2>Para que usamos</h2>
         <p>Para liberar sua leitura, entender o interesse no conteúdo da Larissa e enviar o resultado, conteúdos e novidades por e-mail conforme o aceite informado no cadastro.</p>
@@ -34,7 +34,7 @@ export function PrivacyPolicy({ onClose }: PrivacyPolicyProps) {
         <p>Você pode pedir confirmação, acesso, correção ou exclusão dos seus dados, além de retirar o consentimento de comunicações a qualquer momento.</p>
 
         <h2>Contato</h2>
-        <p>Para exercer seus direitos, entre em contato pelo <a href="https://www.instagram.com/larissaborgepetian/">Instagram da Larissa Petian</a> enquanto o e-mail oficial de privacidade é definido.</p>
+        <p>Para exercer seus direitos, entre em contato pelo <a href="https://www.instagram.com/larissapetian/">Instagram da Larissa Petian</a> enquanto o e-mail oficial de privacidade é definido.</p>
 
         <p className="privacy-disclaimer">O questionário é educativo e não substitui avaliação ou orientação de profissional de saúde.</p>
         <button className="primary-button" type="button" onClick={onClose}>Entendi</button>

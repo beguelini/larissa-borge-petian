@@ -90,12 +90,12 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
       <section className="product-section">
         <div className="shell product-action">
           <div className="product-copy">
-            <h2>O seu resultado é o começo de uma nova forma de cuidar de você.</h2>
-            <p>No Meu Ritmo, você transforma essa leitura em pausas, escolhas e práticas possíveis para a sua vida real — com a orientação da Larissa, sem cobranças e sem fórmulas rígidas.</p>
+            <h2>Você não precisa continuar lutando contra o seu corpo.</h2>
+            <p>No Meu Ritmo, a Larissa ensina como transformar Ayurveda em escolhas possíveis para sua alimentação, seu movimento e sua rotina — para você construir a sua melhor versão com constância, presença e sem sofrimento.</p>
           </div>
           <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
-          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero entrar no pré-lançamento</a>
-          <small>Entre no grupo do WhatsApp para receber os primeiros detalhes, condições especiais e ser avisada antes da abertura.</small>
+          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero transformar meu ritmo com a Larissa</a>
+          <small>Entre agora no grupo do WhatsApp. Você será a primeira a receber os detalhes, as condições especiais e o caminho para parar de recomeçar sozinha.</small>
         </div>
       </section>
       <section className="result-authority" aria-label="Conheça Larissa Petian">

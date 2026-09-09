@@ -8,6 +8,7 @@ type ApiRequest = IncomingMessage & { body?: unknown }
 type LeadPayload = {
   firstName?: unknown
   email?: unknown
+  whatsapp?: unknown
   privacyConsent?: unknown
   marketingConsent?: unknown
   website?: unknown
@@ -43,6 +44,14 @@ function validEmail(value: unknown): value is string {
     && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
+function normalizeWhatsApp(value: unknown) {
+  if (typeof value !== 'string') return null
+  const digits = value.replace(/\D/g, '')
+  const local = digits.replace(/^55(?=\d{10,11}$)/, '')
+  if (!/^[1-9]\d(?:9?\d{8})$/.test(local)) return null
+  return `55${local}`
+}
+
 function cleanSource(value: unknown) {
   if (!isRecord(value)) return {}
   const allowedKeys = ['path', 'referrer', 'utmSource', 'utmMedium', 'utmCampaign']
@@ -75,12 +84,13 @@ function send(response: ServerResponse, result: LeadResponse, extraHeaders: Reco
 export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
   if (!isRecord(body)) return { status: 400, body: { error: 'Dados inválidos.' } }
   const payload = body as LeadPayload
+  const whatsapp = normalizeWhatsApp(payload.whatsapp)
 
   if (typeof payload.website === 'string' && payload.website.trim()) {
     return { status: 201, body: { ok: true } }
   }
-  if (!validName(payload.firstName) || !validEmail(payload.email)) {
-    return { status: 422, body: { error: 'Nome ou e-mail inválido.' } }
+  if (!validName(payload.firstName) || !validEmail(payload.email) || !whatsapp) {
+    return { status: 422, body: { error: 'Nome, e-mail ou WhatsApp inválido.' } }
   }
   if (payload.privacyConsent !== true || payload.marketingConsent !== true) {
     return { status: 422, body: { error: 'Consentimentos inválidos.' } }
@@ -109,6 +119,7 @@ export async function handleLeadPayload(body: unknown): Promise<LeadResponse> {
     body: JSON.stringify({
       first_name: payload.firstName.trim(),
       email: payload.email.trim().toLowerCase(),
+      whatsapp,
       privacy_consent: true,
       marketing_consent: payload.marketingConsent,
       dominant_dosha: result.primary,
