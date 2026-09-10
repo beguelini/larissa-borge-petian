@@ -85,4 +85,19 @@ describe('POST /api/hotmart-webhook', () => {
     expect(JSON.parse(res.body)).toEqual({ ok: true, test: true })
     expect(fetchMock).not.toHaveBeenCalled()
   })
+
+  it('registra uma venda de qualquer produto mesmo sem produto de área de membros configurado', async () => {
+    process.env.HOTMART_HOTTOK = 'hotmart-test-token'
+    process.env.SUPABASE_URL = 'https://project.supabase.co'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(null, { status: 201 }))
+    const res = response()
+    const ebookSale = { ...approvedPurchase, id: 'event-vata-1', data: { ...approvedPurchase.data, product: { id: 99887, name: 'Sabores do Meu Ritmo: Edição Vata' }, purchase: { ...approvedPurchase.data.purchase, transaction: 'HPVATA1' } } }
+
+    await handler(request(ebookSale), res as never)
+
+    expect(res.statusCode).toBe(200)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toMatchObject({ product_id: '99887', product_name: 'Sabores do Meu Ritmo: Edição Vata' })
+  })
 })
