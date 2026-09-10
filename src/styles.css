@@ -973,72 +973,272 @@ img {
   margin-top: 16px;
 }
 
-.product-section {
-  padding-block: 54px calc(50px + env(safe-area-inset-bottom));
+.ebook-offer-section {
+  padding-block: 60px calc(64px + env(safe-area-inset-bottom));
   background: var(--forest);
-  color: #fff8ee;
+  color: #fffaf2;
 }
 
-.product-copy h2 {
-  font-size: clamp(2.75rem, 11.5vw, 4.7rem);
-  line-height: 0.96;
+.ebook-offer-shell {
+  display: grid;
+  gap: 32px;
 }
 
-.product-copy p {
+.ebook-choice {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ebook-choice legend {
+  max-width: 760px;
+  padding: 0;
+  color: #fffaf2;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+
+.ebook-choice-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.ebook-choice-option {
+  position: relative;
+  display: block;
+}
+
+.ebook-choice-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.ebook-choice-option span {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 250, 242, 0.4);
+  border-radius: 14px;
+  color: #fffaf2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.ebook-choice-option:hover span {
+  border-color: #e4ab73;
+  transform: translateY(-1px);
+}
+
+.ebook-choice-option input:checked + span {
+  border-color: #f2c27f;
+  background: #f4eadb;
+  color: var(--forest);
+}
+
+.ebook-choice-option input:focus-visible + span {
+  outline: 3px solid rgba(242, 194, 127, 0.65);
+  outline-offset: 3px;
+}
+
+.ebook-choice > p {
+  max-width: 620px;
+  margin: 17px 0 0;
+  color: #ced7ca;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.ebook-offer-card {
+  display: grid;
+  gap: 32px;
+  align-items: start;
+}
+
+.ebook-cover {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid rgba(255, 250, 242, 0.2);
+  background: rgba(248, 243, 234, 0.08);
+}
+
+.ebook-cover img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.ebook-cover-unavailable {
+  display: none;
+}
+
+.ebook-offer-copy {
+  max-width: 650px;
+}
+
+.ebook-identification,
+.ebook-edition {
+  margin: 0;
+  color: #e9bd88;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ebook-name {
+  margin: 18px 0 4px;
+  color: #fffaf2;
+  font-family: var(--serif);
+  font-size: clamp(2.1rem, 7vw, 3.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.ebook-offer-copy h2 {
+  max-width: 590px;
   margin: 20px 0 0;
-  color: #e5e2d8;
+  font-family: var(--serif);
+  font-size: clamp(2.25rem, 7vw, 3.6rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.ebook-presentation {
+  display: grid;
+  gap: 13px;
+  margin-top: 23px;
+}
+
+.ebook-presentation p {
+  margin: 0;
+  color: #dce5da;
   line-height: 1.62;
 }
 
-.product-action {
+.ebook-highlights,
+.ebook-included-content ul {
   display: grid;
-  justify-items: center;
-  gap: 20px;
-  max-width: 720px;
-  text-align: center;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.product-action > p {
+.ebook-highlights li {
+  display: grid;
+  grid-template-columns: 21px 1fr;
+  gap: 9px;
+  align-items: start;
+  color: #f5efe5;
+  line-height: 1.45;
+}
+
+.ebook-highlights svg {
+  margin-top: 2px;
+  color: #e9bd88;
+}
+
+.ebook-included-content {
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 250, 242, 0.24);
+}
+
+.ebook-included-content h3 {
   margin: 0;
-  color: #f2ecdf;
+  color: #fffaf2;
+  font-family: var(--serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: -0.025em;
 }
 
-.product-action > p span {
-  margin-inline: 5px;
-  color: #aaae9f;
+.ebook-included-content ul {
+  gap: 8px;
+  margin-top: 15px;
 }
 
-.product-action > p strong {
-  color: #df926f;
-  font-size: 1.25rem;
+.ebook-included-content li {
+  position: relative;
+  padding-left: 17px;
+  color: #d6dfd4;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
-.product-button {
-  background: #f3e9da;
+.ebook-included-content li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e9bd88;
+  content: '';
+}
+
+.ebook-purchase {
+  display: grid;
+  gap: 17px;
+  margin-top: 34px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255, 250, 242, 0.24);
+}
+
+.ebook-purchase > div {
+  display: grid;
+  gap: 4px;
+}
+
+.ebook-purchase strong {
+  color: #fffaf2;
+  font-family: var(--serif);
+  font-size: 2.35rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.ebook-purchase span {
+  color: #cdd8cb;
+  font-size: 0.85rem;
+}
+
+.ebook-checkout {
+  background: #f4eadb;
   color: var(--forest);
   box-shadow: none;
 }
 
-.product-button:hover {
-  background: #fff8ee;
+.ebook-checkout:hover {
+  background: #fffaf2;
   color: var(--forest);
+  box-shadow: 0 14px 28px rgba(6, 24, 17, 0.26);
 }
 
-.product-link {
-  display: block;
-  width: fit-content;
-  margin: 16px auto 0;
-  color: #fff8ee;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.ebook-education-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 18px 0 0;
+  color: #c3cec3;
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
-.product-action small {
-  display: block;
-  max-width: 520px;
-  margin: 0;
-  color: #c9cec5;
-  font-size: 0.77rem;
+.ebook-education-note svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #e9bd88;
 }
 
 .result-authority {
@@ -1225,8 +1425,12 @@ img {
   .insights { max-width: 930px; }
   .ritual-panel { padding: 30px; }
 
-  .product-action { margin-inline: auto; }
-  .product-button { width: min(100%, 620px); margin-inline: auto; }
+  .ebook-offer-section { padding-block: 88px; }
+  .ebook-offer-card { grid-template-columns: minmax(280px, 0.65fr) minmax(0, 1fr); gap: clamp(48px, 7vw, 94px); }
+  .ebook-offer-card:has(.ebook-cover-unavailable) { grid-template-columns: minmax(0, 1fr); }
+  .ebook-cover { width: 100%; margin-top: 6px; }
+  .ebook-choice-options { max-width: 620px; }
+  .ebook-checkout { width: min(100%, 430px); }
   .result-authority-inner { grid-template-columns: minmax(260px, 350px) 1fr; gap: 48px; }
   .result-authority img { width: 100%; }
 

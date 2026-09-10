@@ -1,11 +1,13 @@
 import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
-import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
+import { doshaName, getDoshaResultReading } from '../lib/result-content'
+import { EbookOfferSection } from './EbookOfferSection'
 import { FooterLogo } from './FooterLogo'
 
 type ResultScreenProps = {
   firstName: string
   result: QuizResult
+  hasValidResult: boolean
   saveWarning: boolean
   onRestart: () => void
 }
@@ -44,7 +46,7 @@ function ScoreRings({ result }: { result: QuizResult }) {
   )
 }
 
-export function ResultScreen({ firstName, result, saveWarning, onRestart }: ResultScreenProps) {
+export function ResultScreen({ firstName, result, hasValidResult, saveWarning, onRestart }: ResultScreenProps) {
   const reading = getDoshaResultReading(result)
 
   return (
@@ -87,17 +89,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
         {saveWarning && <p className="save-warning" role="status">Seu resultado foi aberto, mas não conseguimos registrar seus dados agora. Tente novamente mais tarde para entrar na lista da Larissa.</p>}
       </section>
 
-      <section className="product-section">
-        <div className="shell product-action">
-          <div className="product-copy">
-            <h2>Você não precisa continuar lutando contra o seu corpo.</h2>
-            <p>No Meu Ritmo, a Larissa ensina como transformar Ayurveda em escolhas possíveis para sua alimentação, seu movimento e sua rotina — para você construir a sua melhor versão com constância, presença e sem sofrimento.</p>
-          </div>
-          <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
-          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero transformar meu ritmo com a Larissa</a>
-          <small>Entre agora no grupo do WhatsApp. Você será a primeira a receber os detalhes, as condições especiais e o caminho para parar de recomeçar sozinha.</small>
-        </div>
-      </section>
+      <EbookOfferSection result={result} hasValidResult={hasValidResult} />
       <section className="result-authority" aria-label="Conheça Larissa Petian">
         <div className="shell result-authority-inner">
           <img src="/post-biografia.png" alt="Larissa Petian, professora de Hatha e Vinyasa Yoga e terapeuta Ayurveda" />
