@@ -14,7 +14,7 @@ import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
 import { quizQuestions } from './data/questions'
-import { scoreQuiz } from './lib/results'
+import { hasCompleteAnswers, scoreQuiz } from './lib/results'
 import type { LeadFormData, QuizAnswers } from './types'
 
 type Screen = 'landing' | 'quiz' | 'capture' | 'result'
@@ -53,6 +53,7 @@ export default function App() {
   const [saveWarning, setSaveWarning] = useState(false)
 
   const result = useMemo(() => scoreQuiz(answers), [answers])
+  const hasValidResult = useMemo(() => hasCompleteAnswers(answers), [answers])
 
   useEffect(() => {
     window.localStorage.setItem(progressKey, JSON.stringify({ answers, currentQuestion }))
@@ -154,6 +155,7 @@ export default function App() {
         <ResultScreen
           firstName={firstName}
           result={result}
+          hasValidResult={hasValidResult}
           saveWarning={saveWarning}
           onRestart={restart}
         />
