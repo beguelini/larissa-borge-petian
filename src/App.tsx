@@ -14,6 +14,7 @@ import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
 import { quizQuestions } from './data/questions'
+import { trackMetaLead } from './lib/meta-pixel'
 import { hasCompleteAnswers, scoreQuiz } from './lib/results'
 import type { LeadFormData, QuizAnswers } from './types'
 
@@ -111,6 +112,7 @@ export default function App() {
         body: JSON.stringify(payload),
       })
       if (!response.ok) throw new Error('Falha ao salvar o resultado')
+      trackMetaLead()
     } catch {
       setSaveWarning(true)
     }
