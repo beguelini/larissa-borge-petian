@@ -66,6 +66,22 @@ export function EbookOfferSection({ result, hasValidResult }: EbookOfferSectionP
               <p className="ebook-edition">{offer.editionName}</p>
               <h2>{offer.title}</h2>
 
+              <div className="ebook-purchase">
+                <div>
+                  <strong>{formatEbookPrice(offer.amountInCents, offer.currency)}</strong>
+                  <span>E-book digital • {offer.editionName}</span>
+                  <span className="ebook-installment">12 x de R$ 4,86* no cartão de crédito</span>
+                </div>
+                <a
+                  className="product-button ebook-checkout"
+                  href={offer.checkoutUrl}
+                  rel="noreferrer"
+                  referrerPolicy="no-referrer"
+                >
+                  {offer.buttonLabel}<ArrowRight aria-hidden="true" size={20} strokeWidth={1.8} />
+                </a>
+              </div>
+
               <div className="ebook-presentation">
                 {offer.presentation.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </div>
@@ -82,21 +98,6 @@ export function EbookOfferSection({ result, hasValidResult }: EbookOfferSectionP
                   {ebookIncludedContent.map((item) => <li key={item}>{item}</li>)}
                 </ul>
               </section>
-
-              <div className="ebook-purchase">
-                <div>
-                  <strong>{formatEbookPrice(offer.amountInCents, offer.currency)}</strong>
-                  <span>E-book digital • {offer.editionName}</span>
-                </div>
-                <a
-                  className="product-button ebook-checkout"
-                  href={offer.checkoutUrl}
-                  rel="noreferrer"
-                  referrerPolicy="no-referrer"
-                >
-                  {offer.buttonLabel}<ArrowRight aria-hidden="true" size={20} strokeWidth={1.8} />
-                </a>
-              </div>
 
               <p className="ebook-education-note"><Info aria-hidden="true" size={17} />{ebookEducationNote}</p>
             </div>
