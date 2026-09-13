@@ -1,6 +1,6 @@
 import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
-import { doshaName, getDoshaResultReading } from '../lib/result-content'
+import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
 import { EbookOfferSection } from './EbookOfferSection'
 import { FooterLogo } from './FooterLogo'
 
