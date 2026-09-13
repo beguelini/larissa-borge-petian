@@ -16,13 +16,13 @@ export const prelaunchWhatsAppUrl = 'https://chat.whatsapp.com/HvofSYG7Ysg5w3uvL
 
 export const resultContent: Record<Dosha, { support: string; insights: string[]; ritual: string }> = {
   vata: {
-    support: 'Criatividade, movimento e sensibilidade aparecem com força no seu jeito de viver.',
+    support: 'Criatividade, movimento e sensibilidade aparecem com força no seu jeito de viver. Quando tudo acelera, o seu corpo pode pedir mais aterramento e previsibilidade.',
     insights: [
       'Você tende a perceber possibilidades e responder com rapidez.',
-      'O excesso de estímulos pode espalhar sua energia ao longo do dia.',
-      'Regularidade e acolhimento ajudam a devolver presença ao seu ritmo.',
+      'O excesso de estímulos pode deixar a mente mais agitada e espalhar sua energia ao longo do dia.',
+      'Regularidade, alimentação que acolhe e movimento gentil podem ajudar você a se sentir mais presente no seu ritmo.',
     ],
-    ritual: 'Antes de começar o dia, aqueça as mãos, apoie-as sobre o peito e faça 6 respirações longas. Depois, escolha apenas uma prioridade.',
+    ritual: 'Antes de começar o dia, aqueça as mãos, apoie-as sobre o peito e faça 6 respirações longas. Depois, escolha uma prioridade e uma refeição simples que sustente o seu dia.',
   },
   pitta: {
     support: 'Clareza, intensidade e direção aparecem com força no seu jeito de viver.',

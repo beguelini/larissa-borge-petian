@@ -98,7 +98,7 @@ describe('POST /api/leads', () => {
     expect(message.to).toEqual(['ana@example.com'])
     expect(message.subject).toBe('Seu resultado dosha está pronto, Ana')
     expect(String(message.html)).toContain('O que isso pode revelar')
-    expect(String(message.html)).toContain('Quero transformar meu ritmo com a Larissa')
+    expect(String(message.html)).toContain('Quero ser acompanhada pela Larissa')
     expect(String(message.html)).toContain('https://chat.whatsapp.com/HvofSYG7Ysg5w3uvLuup7W?mode=gi_t')
   })
 
