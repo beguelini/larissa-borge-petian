@@ -61,8 +61,8 @@ export function EnrollmentScreen() {
       <section className="enrollment-hero shell">
         <div>
           <p className="enrollment-kicker">Ayurveda para vida real</p>
-          <h1>Seu ritmo merece espaço na sua vida.</h1>
-          <p className="enrollment-lead">Meu Ritmo é um caminho leve para se reconectar com o seu corpo, sua rotina e escolhas que fazem sentido para você.</p>
+          <h1>Um ritmo mais calmo começa em escolhas que acolhem você.</h1>
+          <p className="enrollment-lead">Meu Ritmo é um caminho para quem vive com a mente acelerada e quer construir, com orientação da Larissa, uma relação mais sustentável com alimentação, movimento e corpo.</p>
           <CheckoutButton />
           <p className="enrollment-security"><LockKeyhole aria-hidden="true" size={17} /> Pagamento processado com segurança pela Hotmart.</p>
         </div>
@@ -77,7 +77,7 @@ export function EnrollmentScreen() {
           <div>
             <p className="enrollment-kicker">Talvez você também sinta</p>
             <h2>A vida real nem sempre vem no ritmo que a gente gostaria.</h2>
-            <p>Entre tarefas, expectativas e muitas responsabilidades, é fácil se desconectar do que realmente importa. Meu Ritmo nasce como um convite para voltar a se escutar.</p>
+          <p>Entre tarefas, expectativas e muitas responsabilidades, a mente pode ficar acelerada e o corpo entrar em modo de sobrevivência. Meu Ritmo nasce como um convite para voltar a se escutar — sem dietas rígidas, culpa ou a exigência de dar conta de tudo.</p>
           </div>
           <p className="enrollment-quote">Não se trata de fazer mais. Trata-se de fazer diferente, com mais presença.</p>
         </div>
@@ -87,7 +87,7 @@ export function EnrollmentScreen() {
         <div className="enrollment-authority-copy">
           <p className="enrollment-kicker">Prazer, eu sou a Larissa</p>
           <h2 id="larissa-title">Um caminho de cuidado que conversa com a sua vida real.</h2>
-          <p>Sou professora de Hatha e Vinyasa Yoga e terapeuta Ayurveda. Em Meu Ritmo, reuni práticas e reflexões para que você se aproxime do seu bem-estar com mais presença, gentileza e autonomia.</p>
+          <p>Sou professora de Hatha e Vinyasa Yoga e Terapeuta Ayurveda. Estou disponível para acompanhar mulheres que desejam compreender os próprios padrões e criar escolhas mais sustentáveis para alimentação, movimento e rotina — com presença, gentileza e autonomia.</p>
           <p className="enrollment-authority-signature">Larissa Petian</p>
         </div>
         <figure className="enrollment-authority-image">
@@ -100,13 +100,13 @@ export function EnrollmentScreen() {
           <div className="enrollment-live-intro">
             <p className="enrollment-kicker">Acompanhamento que aproxima</p>
             <h2 id="live-support-title">Você não precisa atravessar essa mudança sozinha.</h2>
-            <p>Meu Ritmo não é apenas uma biblioteca de conteúdos. É um espaço para ser vista, compreendida e acompanhada enquanto transforma pequenas escolhas em uma rotina que realmente cabe na sua vida.</p>
+            <p>Meu Ritmo não é apenas uma biblioteca de conteúdos. É um espaço para ser vista, compreendida e acompanhada enquanto transforma pequenas escolhas em uma rotina que realmente cabe na sua vida — especialmente nos dias em que a mente parece não desligar.</p>
           </div>
           <div className="enrollment-live-details">
             <article>
               <span>Ao vivo, a cada quinze dias</span>
               <h3>Encontros com a Larissa para olhar para você, uma a uma.</h3>
-              <p>Traga suas dúvidas, seus desafios e o que está vivendo agora. Em cada encontro, Larissa conduz uma análise atenta das alunas, para que você encontre próximos passos mais claros e possíveis.</p>
+              <p>Traga suas dúvidas, seus desafios e o que está vivendo agora. Em cada encontro, Larissa conduz uma análise atenta das alunas para orientar próximos passos mais claros em alimentação, movimento e rotina.</p>
             </article>
             <article className="enrollment-vip">
               <span>Para quem deseja ir além</span>
@@ -152,10 +152,10 @@ export function EnrollmentScreen() {
           <h2>Para mulheres que desejam viver com mais sentido, presença e autonomia.</h2>
         </div>
         <ul>
-          <li><CheckCircle2 />Querem desacelerar e se escutar melhor.</li>
+          <li><CheckCircle2 />Vivem com a mente acelerada e querem se escutar melhor.</li>
           <li><CheckCircle2 />Buscam uma relação mais consciente com a rotina.</li>
           <li><CheckCircle2 />Desejam conhecer o Ayurveda de forma prática.</li>
-          <li><CheckCircle2 />Querem transformar pequenas escolhas do dia a dia.</li>
+          <li><CheckCircle2 />Querem transformar pequenas escolhas em uma rotina mais estável e sustentável.</li>
         </ul>
       </section>
 

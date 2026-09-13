@@ -21,7 +21,8 @@ function escapeHtml(value: string) {
 }
 
 function emailButton(url: string, label: string) {
-  return `<table role="presentation" border="0" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td align="center" bgcolor="#c96e4a" style="border-radius:8px;background-color:#c96e4a"><a href="${url}" style="display:inline-block;padding:15px 22px;border:1px solid #c96e4a;border-radius:8px;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;line-height:20px;text-decoration:none">${label}</a></td></tr></table>`
+  const displayLabel = label === 'Quero transformar meu ritmo com a Larissa' ? 'Quero ser acompanhada pela Larissa' : label
+  return `<table role="presentation" border="0" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td align="center" bgcolor="#c96e4a" style="border-radius:8px;background-color:#c96e4a"><a href="${url}" style="display:inline-block;padding:15px 22px;border:1px solid #c96e4a;border-radius:8px;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;line-height:20px;text-decoration:none">${displayLabel}</a></td></tr></table>`
 }
 
 export function createDoshaResultEmail({ firstName, primary, secondary, isBalanced, percentages }: ResultEmailInput) {
@@ -42,7 +43,7 @@ export function createDoshaResultEmail({ firstName, primary, secondary, isBalanc
     ...reading.content.insights.map((insight, index) => `${index + 1}. ${insight}`),
     `Seu primeiro ritual: ${reading.content.ritual}`,
     'Esta é uma leitura educativa de autoconhecimento, não um diagnóstico.',
-    `Você não precisa continuar lutando contra o seu corpo. Entre no grupo do WhatsApp e seja a primeira a descobrir como a Larissa transforma Ayurveda em escolhas possíveis para alimentação, movimento e rotina — com constância e sem sofrimento: ${prelaunchWhatsAppUrl}`,
+    `Quando a mente acelera, seu corpo merece um caminho que acolha. Entre no grupo do WhatsApp e descubra como a Larissa, Terapeuta Ayurveda, orienta escolhas mais sustentáveis para alimentação, movimento e rotina: ${prelaunchWhatsAppUrl}`,
   ].join('\n\n')
 
   return {

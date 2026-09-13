@@ -90,12 +90,12 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
       <section className="product-section">
         <div className="shell product-action">
           <div className="product-copy">
-            <h2>Você não precisa continuar lutando contra o seu corpo.</h2>
-            <p>No Meu Ritmo, a Larissa ensina como transformar Ayurveda em escolhas possíveis para sua alimentação, seu movimento e sua rotina — para você construir a sua melhor versão com constância, presença e sem sofrimento.</p>
+            <h2>Quando a mente acelera, seu corpo merece um caminho que acolha.</h2>
+            <p>No Meu Ritmo, a Larissa — Terapeuta Ayurveda — acompanha você com práticas para tornar alimentação, movimento e rotina mais sustentáveis. É um cuidado possível para sair do ciclo de cobrança e cultivar mais calma, presença e confiança no seu corpo.</p>
           </div>
           <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
-          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero transformar meu ritmo com a Larissa</a>
-          <small>Entre agora no grupo do WhatsApp. Você será a primeira a receber os detalhes, as condições especiais e o caminho para parar de recomeçar sozinha.</small>
+          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero ser acompanhada pela Larissa</a>
+          <small>Entre agora no grupo do WhatsApp. Você receberá em primeira mão os detalhes, condições especiais e os próximos passos para construir uma relação mais leve com a comida, o movimento e o seu corpo.</small>
         </div>
       </section>
       <section className="result-authority" aria-label="Conheça Larissa Petian">
@@ -104,7 +104,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
           <div>
             <p className="authority-kicker">Seu cuidado pode continuar</p>
             <h2>Conte com a Larissa nessa jornada.</h2>
-            <p>Receba inspirações, práticas possíveis e conversas sobre Ayurveda para tornar o cuidado com você uma parte real da sua rotina.</p>
+            <p>Receba inspirações, práticas possíveis e conversas sobre Ayurveda para tornar o cuidado com você uma parte real da sua rotina. Se a ansiedade estiver intensa ou persistente, procure também apoio de uma profissional de saúde.</p>
             <a className="instagram-result-link" href="https://www.instagram.com/larissapetian/" target="_blank" rel="noreferrer"><Camera aria-hidden="true" size={19} /> Seguir @larissapetian <ArrowUpRight aria-hidden="true" size={17} /></a>
           </div>
         </div>
