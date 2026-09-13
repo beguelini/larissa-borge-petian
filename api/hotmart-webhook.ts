@@ -14,9 +14,9 @@ async function readBody(req: IncomingMessage) { let body = ''; for await (const 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return send(res, 405, { error: 'Método não permitido.' }) }
   const hottok = process.env.HOTMART_HOTTOK
-  const productId = process.env.HOTMART_PRODUCT_ID
+  const memberAccessProductId = process.env.HOTMART_PRODUCT_ID
   const receivedHottok = req.headers['x-hotmart-hottok']
-  if (!hottok || !productId) return send(res, 503, { error: 'Integração temporariamente indisponível.' })
+  if (!hottok) return send(res, 503, { error: 'Integração temporariamente indisponível.' })
   if (typeof receivedHottok !== 'string' || !matches(receivedHottok, hottok)) return send(res, 401, { error: 'Webhook não autorizado.' })
   const connection = db()
   if (!connection) return send(res, 503, { error: 'Serviço temporariamente indisponível.' })
@@ -46,7 +46,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (!eventResponse.ok) throw new Error('event')
     processedEventId = eventId
 
-    if (payload.event !== 'PURCHASE_APPROVED' || data.purchase.status !== 'APPROVED' || !buyerName || String(receivedProductId) !== productId) return send(res, 200, { ok: true })
+    if (payload.event !== 'PURCHASE_APPROVED' || data.purchase.status !== 'APPROVED' || !buyerName || !memberAccessProductId || String(receivedProductId) !== memberAccessProductId) return send(res, 200, { ok: true })
     const activation = createActivationToken()
     const now = new Date()
     const accountResponse = await fetch(`${connection.url}/rest/v1/member_accounts?email=eq.${encodeURIComponent(buyerEmail)}&select=id&limit=1`, { headers })

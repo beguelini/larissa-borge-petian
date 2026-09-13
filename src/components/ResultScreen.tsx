@@ -1,11 +1,13 @@
 import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
-import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
+import { doshaName, getDoshaResultReading } from '../lib/result-content'
+import { EbookOfferSection } from './EbookOfferSection'
 import { FooterLogo } from './FooterLogo'
 
 type ResultScreenProps = {
   firstName: string
   result: QuizResult
+  hasValidResult: boolean
   saveWarning: boolean
   onRestart: () => void
 }
@@ -44,7 +46,7 @@ function ScoreRings({ result }: { result: QuizResult }) {
   )
 }
 
-export function ResultScreen({ firstName, result, saveWarning, onRestart }: ResultScreenProps) {
+export function ResultScreen({ firstName, result, hasValidResult, saveWarning, onRestart }: ResultScreenProps) {
   const reading = getDoshaResultReading(result)
 
   return (
@@ -98,6 +100,7 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
           <small>Entre agora no grupo do WhatsApp. Você receberá em primeira mão os detalhes, condições especiais e os próximos passos para construir uma relação mais leve com a comida, o movimento e o seu corpo.</small>
         </div>
       </section>
+      <EbookOfferSection result={result} hasValidResult={hasValidResult} />
       <section className="result-authority" aria-label="Conheça Larissa Petian">
         <div className="shell result-authority-inner">
           <img src="/post-biografia.png" alt="Larissa Petian, professora de Hatha e Vinyasa Yoga e terapeuta Ayurveda" />
