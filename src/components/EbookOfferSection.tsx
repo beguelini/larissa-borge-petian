@@ -1,6 +1,6 @@
 import { ArrowRight, Check, Info } from 'lucide-react'
 import { useState } from 'react'
-import type { Dosha, QuizResult } from '../types'
+import type { Dosha } from '../types'
 import {
   ebookEducationNote,
   ebookIncludedContent,
@@ -10,18 +10,11 @@ import {
   type EbookOffer,
 } from '../lib/ebook-offers'
 
-type EbookOfferSectionProps = {
-  result: QuizResult
-  hasValidResult: boolean
-}
-
-export function EbookOfferSection({ result, hasValidResult }: EbookOfferSectionProps) {
-  const selection = getEbookOfferSelection(result, hasValidResult)
+export function EbookOfferSection() {
+  const selection = getEbookOfferSelection()
   const [selectedDosha, setSelectedDosha] = useState<Dosha | null>(null)
   const selectedOfferDosha = selectedDosha && selection.availableDoshas.includes(selectedDosha) ? selectedDosha : null
-  const activeDosha = selection.requiresChoice && selectedOfferDosha
-    ? selectedOfferDosha
-    : selection.requiresChoice ? null : selection.defaultDosha
+  const activeDosha = selectedOfferDosha ?? selection.defaultDosha
   const offer = activeDosha ? ebookOffers[activeDosha] : null
 
   if (!selection.availableDoshas.length) return null
@@ -31,7 +24,7 @@ export function EbookOfferSection({ result, hasValidResult }: EbookOfferSectionP
       <div className="shell ebook-offer-shell">
         {selection.requiresChoice && (
           <fieldset className="ebook-choice">
-            <legend>Seu resultado reúne características de mais de um dosha. Eu preparei edições diferentes para você explorar. Escolha qual deseja conhecer primeiro.</legend>
+            <legend>Escolha a edição que você deseja conhecer. Todas foram pensadas para inspirar uma rotina alimentar mais acolhedora e estável, independentemente do resultado do seu questionário.</legend>
             <div className="ebook-choice-options">
               {selection.availableDoshas.map((dosha) => {
                 const option = ebookOffers[dosha]
@@ -52,7 +45,7 @@ export function EbookOfferSection({ result, hasValidResult }: EbookOfferSectionP
                 )
               })}
             </div>
-            <p>Sua escolha serve apenas para conhecer o conteúdo, sem alterar o resultado do seu questionário.</p>
+            <p>Sua escolha define apenas a edição que você quer receber, sem alterar o resultado do seu questionário.</p>
           </fieldset>
         )}
 
