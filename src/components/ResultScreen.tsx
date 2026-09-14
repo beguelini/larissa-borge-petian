@@ -1,6 +1,6 @@
 import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
-import { doshaName, getDoshaResultReading, prelaunchWhatsAppUrl } from '../lib/result-content'
+import { doshaName, getDoshaResultReading } from '../lib/result-content'
 import { EbookOfferSection } from './EbookOfferSection'
 import { FooterLogo } from './FooterLogo'
 
@@ -88,17 +88,6 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
         {saveWarning && <p className="save-warning" role="status">Seu resultado foi aberto, mas não conseguimos registrar seus dados agora. Tente novamente mais tarde para entrar na lista da Larissa.</p>}
       </section>
 
-      <section className="product-section">
-        <div className="shell product-action">
-          <div className="product-copy">
-            <h2>Quando a mente acelera, seu corpo merece um caminho que acolha.</h2>
-            <p>No Meu Ritmo, a Larissa — Terapeuta Ayurveda — acompanha você com práticas para tornar alimentação, movimento e rotina mais sustentáveis. É um cuidado possível para sair do ciclo de cobrança e cultivar mais calma, presença e confiança no seu corpo.</p>
-          </div>
-          <p>Pré-lançamento <span>•</span> <strong>Grupo exclusivo Meu Ritmo</strong></p>
-          <a className="product-button" href={prelaunchWhatsAppUrl} target="_blank" rel="noreferrer">Quero ser acompanhada pela Larissa</a>
-          <small>Entre agora no grupo do WhatsApp. Você receberá em primeira mão os detalhes, condições especiais e os próximos passos para construir uma relação mais leve com a comida, o movimento e o seu corpo.</small>
-        </div>
-      </section>
       <EbookOfferSection />
       <section className="result-authority" aria-label="Conheça Larissa Petian">
         <div className="shell result-authority-inner">

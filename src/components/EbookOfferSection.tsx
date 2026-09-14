@@ -22,9 +22,14 @@ export function EbookOfferSection() {
   return (
     <section className="ebook-offer-section" aria-label="Oferta de e-book Sabores do Meu Ritmo">
       <div className="shell ebook-offer-shell">
+        <header className="ebook-result-intro">
+          <p>Seu resultado é um ponto de partida</p>
+          <h2>Transforme essa leitura em refeições que acolhem a sua mente.</h2>
+          <span>O Sabores do Meu Ritmo foi criado para quem quer sair do improviso, ter mais regularidade e construir uma relação mais gentil com a comida — especialmente nos dias em que a ansiedade acelera tudo.</span>
+        </header>
         {selection.requiresChoice && (
           <fieldset className="ebook-choice">
-            <legend>Escolha a edição que você deseja conhecer. Todas foram pensadas para inspirar uma rotina alimentar mais acolhedora e estável, independentemente do resultado do seu questionário.</legend>
+            <legend>Escolha a edição que deseja receber. Todas foram pensadas para uma rotina alimentar mais acolhedora e estável, independentemente do resultado do seu questionário.</legend>
             <div className="ebook-choice-options">
               {selection.availableDoshas.map((dosha) => {
                 const option = ebookOffers[dosha]
