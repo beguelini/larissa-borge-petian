@@ -4,7 +4,7 @@ import { createActivationToken } from './_lib/member-activation.js'
 import { email, hashMemberPassword } from './_lib/member-auth.js'
 import { sendMemberWelcomeEmail } from './lib/member-welcome-email.js'
 
-type PurchaseWebhook = { id?: unknown; creation_date?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown; name?: unknown }; purchase?: { transaction?: unknown; status?: unknown; price?: { value?: unknown; currency_value?: unknown }; payment?: { type?: unknown } } } }
+type PurchaseWebhook = { id?: unknown; creation_date?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown; ucode?: unknown; name?: unknown }; commissions?: { value?: unknown; source?: unknown; currency_value?: unknown }[]; purchase?: { transaction?: unknown; status?: unknown; price?: { value?: unknown; currency_value?: unknown }; full_price?: { value?: unknown }; checkout_country?: { name?: unknown }; offer?: { code?: unknown; coupon_code?: unknown }; payment?: { type?: unknown; installments_number?: unknown } } } }
 const send = (res: ServerResponse, status: number, body: Record<string, unknown>) => { res.statusCode = status; res.setHeader('Cache-Control', 'no-store'); res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)) }
 const db = () => { const url = process.env.SUPABASE_URL?.replace(/\/$/, ''); const key = process.env.SUPABASE_SERVICE_ROLE_KEY; return url && key ? { url, key } : null }
 const matches = (received: string, expected: string) => { const a = Buffer.from(received); const b = Buffer.from(expected); return a.length === b.length && timingSafeEqual(a, b) }
@@ -35,13 +35,23 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const buyerName = asText(data.buyer?.name, 100)
     const receivedProductId = data.product?.id
     const productName = asText(data.product?.name, 160)
+    const productSku = asText(data.product?.sku, 100)
+    const productUcode = asText(data.product?.ucode, 100)
     const currency = asText(data.purchase.price?.currency_value, 8)
     const paymentType = asText(data.purchase.payment?.type, 40)
+    const paymentInstallments = typeof data.purchase.payment?.installments_number === 'number' && Number.isInteger(data.purchase.payment.installments_number) ? data.purchase.payment.installments_number : null
     const grossAmount = typeof data.purchase.price?.value === 'number' && Number.isFinite(data.purchase.price.value) ? data.purchase.price.value : null
+    const fullAmount = typeof data.purchase.full_price?.value === 'number' && Number.isFinite(data.purchase.full_price.value) ? data.purchase.full_price.value : null
+    const commissions = Array.isArray(data.commissions) ? data.commissions.flatMap((commission) => {
+      const value = typeof commission?.value === 'number' && Number.isFinite(commission.value) ? commission.value : null
+      const source = asText(commission?.source, 40)
+      return value === null || !source ? [] : [{ source, value, currency: asText(commission.currency_value, 8) }]
+    }) : []
+    const producerCommission = commissions.filter((commission) => commission.source === 'PRODUCER').reduce((sum, commission) => sum + commission.value, 0) || null
     const createdAt = typeof payload.creation_date === 'number' && Number.isFinite(payload.creation_date) ? new Date(payload.creation_date).toISOString() : new Date().toISOString()
     if (!eventId || !transaction || !buyerEmail || !productName || grossAmount === null) return send(res, 422, { error: 'Dados da compra inválidos.' })
 
-    const eventResponse = await fetch(`${connection.url}/rest/v1/hotmart_webhook_events`, { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ hotmart_event_id: eventId, transaction_code: transaction, event_type: payload.event, buyer_email: buyerEmail, product_id: String(receivedProductId ?? ''), product_name: productName, event_created_at: createdAt, purchase_status: asText(data.purchase.status, 32), gross_amount: grossAmount, currency, payment_type: paymentType }) })
+    const eventResponse = await fetch(`${connection.url}/rest/v1/hotmart_webhook_events`, { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ hotmart_event_id: eventId, transaction_code: transaction, event_type: payload.event, buyer_email: buyerEmail, buyer_name: buyerName, product_id: String(receivedProductId ?? ''), product_name: productName, product_sku: productSku, product_ucode: productUcode, event_created_at: createdAt, purchase_status: asText(data.purchase.status, 32), gross_amount: grossAmount, full_amount: fullAmount, currency, payment_type: paymentType, payment_installments: paymentInstallments, checkout_country: asText(data.purchase.checkout_country?.name, 80), offer_code: asText(data.purchase.offer?.code, 100), coupon_code: asText(data.purchase.offer?.coupon_code, 100), commissions, producer_commission: producerCommission }) })
     if (eventResponse.status === 409) return send(res, 200, { ok: true, duplicate: true })
     if (!eventResponse.ok) throw new Error('event')
     processedEventId = eventId

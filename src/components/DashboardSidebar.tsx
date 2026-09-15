@@ -8,7 +8,7 @@ export function DashboardSidebar({ active }: { active: DashboardSection }) {
     { label: 'Painel', icon: Home, href: '/painel', id: 'panel' },
     { label: 'Cadastros', icon: Users, href: '/cadastros', id: 'registrations' },
     { label: 'Doshas', icon: LineChart, href: '/doshas', id: 'doshas' },
-    { label: 'Faturamento Hotmart', icon: BadgeDollarSign, href: '/faturamento-hotmart', id: 'finance' },
+    { label: 'Faturamento', icon: BadgeDollarSign, href: '/faturamento-hotmart', id: 'finance' },
     { label: 'Configurações', icon: Settings, href: '/configuracoes', id: 'settings' },
   ]
 
