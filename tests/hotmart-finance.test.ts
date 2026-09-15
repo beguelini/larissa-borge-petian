@@ -10,8 +10,8 @@ describe('summarizeHotmart', () => {
     ])
 
     expect(summary.products).toEqual([
-      { product: 'Sabores do Meu Ritmo: Edição Kapha', productId: 'kapha-1', orders: 1, grossRevenue: 47, reversals: 0, netRevenue: 47, ticket: 47 },
-      { product: 'Sabores do Meu Ritmo: Edição Vata', productId: 'vata-1', orders: 1, grossRevenue: 47, reversals: 47, netRevenue: 0, ticket: 47 },
+      { product: 'Sabores do Meu Ritmo: Edição Kapha', productId: 'kapha-1', orders: 1, grossRevenue: 47, reversals: 0, fees: 5.65, netRevenue: 41.35, ticket: 47 },
+      { product: 'Sabores do Meu Ritmo: Edição Vata', productId: 'vata-1', orders: 1, grossRevenue: 47, reversals: 47, fees: 0, netRevenue: 0, ticket: 47 },
     ])
   })
 })
