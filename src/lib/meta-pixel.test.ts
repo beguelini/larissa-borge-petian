@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { trackMetaLead } from './meta-pixel'
+import { trackMetaEbookCheckout, trackMetaEbookSalesView, trackMetaLead } from './meta-pixel'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -19,5 +19,34 @@ describe('trackMetaLead', () => {
     vi.stubGlobal('window', {})
 
     expect(() => trackMetaLead()).not.toThrow()
+  })
+})
+
+describe('e-book sales tracking', () => {
+  it('registra a visualização do conjunto de e-books sem dados pessoais', () => {
+    const fbq = vi.fn()
+    vi.stubGlobal('window', { fbq })
+
+    trackMetaEbookSalesView()
+
+    expect(fbq).toHaveBeenCalledWith('track', 'ViewContent', expect.objectContaining({
+      content_name: 'Sabores do Meu Ritmo',
+      content_type: 'product_group',
+      currency: 'BRL',
+      value: 47,
+    }))
+  })
+
+  it('registra o início do checkout para a edição escolhida', () => {
+    const fbq = vi.fn()
+    vi.stubGlobal('window', { fbq })
+
+    trackMetaEbookCheckout('vata')
+
+    expect(fbq).toHaveBeenCalledWith('track', 'InitiateCheckout', expect.objectContaining({
+      content_ids: ['sabores-meu-ritmo-vata'],
+      currency: 'BRL',
+      value: 47,
+    }))
   })
 })
