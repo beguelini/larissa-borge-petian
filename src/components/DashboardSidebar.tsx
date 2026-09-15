@@ -1,13 +1,14 @@
-import { BadgeDollarSign, Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
+import { BadgeDollarSign, HeartHandshake, Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
 import { BotanicalSprig } from './Illustrations'
 
-type DashboardSection = 'panel' | 'registrations' | 'doshas' | 'settings' | 'finance'
+type DashboardSection = 'panel' | 'registrations' | 'doshas' | 'settings' | 'finance' | 'consultations'
 
 export function DashboardSidebar({ active }: { active: DashboardSection }) {
   const items = [
     { label: 'Painel', icon: Home, href: '/painel', id: 'panel' },
     { label: 'Cadastros', icon: Users, href: '/cadastros', id: 'registrations' },
     { label: 'Doshas', icon: LineChart, href: '/doshas', id: 'doshas' },
+    { label: 'Consultas', icon: HeartHandshake, href: '/consultas', id: 'consultations' },
     { label: 'Faturamento', icon: BadgeDollarSign, href: '/faturamento-hotmart', id: 'finance' },
     { label: 'Configurações', icon: Settings, href: '/configuracoes', id: 'settings' },
   ]

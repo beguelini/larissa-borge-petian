@@ -12,6 +12,7 @@ type QuizScreenProps = {
   onAdvance: () => void
   onBack: () => void
   onExit: () => void
+  variant?: 'dosha' | 'consultation'
 }
 
 export function QuizScreen({
@@ -23,6 +24,7 @@ export function QuizScreen({
   onAdvance,
   onBack,
   onExit,
+  variant = 'dosha',
 }: QuizScreenProps) {
   const [pendingSelection, setPendingSelection] = useState<string | undefined>()
   const advanceTimer = useRef<number | null>(null)
@@ -59,7 +61,7 @@ export function QuizScreen({
       <section className="question-shell shell" key={question.id}>
         <p className="question-category">{question.category}</p>
         <h1>{question.prompt}</h1>
-        <p className="question-helper">Escolha a opção que mais se parece com o seu jeito habitual.</p>
+        <p className="question-helper">{variant === 'consultation' ? 'Responda pelo que mais representa o seu momento habitual. A Larissa usará esta leitura para preparar a consulta.' : 'Escolha a opção que mais se parece com o seu jeito habitual.'}</p>
 
         <div className="answer-list" role="radiogroup" aria-label={question.prompt}>
           {question.options.map((option) => {

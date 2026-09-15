@@ -11,6 +11,8 @@ import { MemberAccessScreen } from './components/MemberAccessScreen'
 import { EnrollmentScreen } from './components/EnrollmentScreen'
 import { EbookSalesScreen } from './components/EbookSalesScreen'
 import { HotmartFinanceScreen } from './components/HotmartFinanceScreen'
+import { ConsultationPatientsScreen } from './components/ConsultationPatientsScreen'
+import { ConsultationSalesScreen } from './components/ConsultationSalesScreen'
 import { PrivacyPolicy } from './components/PrivacyPolicy'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultScreen } from './components/ResultScreen'
@@ -47,6 +49,8 @@ export default function App() {
   const isEnrollmentRoute = window.location.pathname === '/inscricao'
   const isEbookSalesRoute = window.location.pathname === '/sabores-do-meu-ritmo'
   const isHotmartFinanceRoute = window.location.pathname === '/faturamento-hotmart'
+  const isConsultationRoute = window.location.pathname === '/consulta'
+  const isConsultationsDashboardRoute = window.location.pathname === '/consultas'
   const savedProgress = useMemo(() => readProgress(), [])
   const [screen, setScreen] = useState<Screen>('landing')
   const [answers, setAnswers] = useState<QuizAnswers>(savedProgress.answers)
@@ -132,7 +136,7 @@ export default function App() {
 
   return (
     <main>
-      {isEbookSalesRoute ? <EbookSalesScreen /> : isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isHotmartFinanceRoute ? <DashboardGuard><HotmartFinanceScreen /></DashboardGuard> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
+      {isConsultationRoute ? <ConsultationSalesScreen /> : isEbookSalesRoute ? <EbookSalesScreen /> : isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isHotmartFinanceRoute ? <DashboardGuard><HotmartFinanceScreen /></DashboardGuard> : isConsultationsDashboardRoute ? <DashboardGuard><ConsultationPatientsScreen /></DashboardGuard> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen
