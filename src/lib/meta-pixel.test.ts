@@ -10,15 +10,18 @@ describe('trackMetaLead', () => {
     const fbq = vi.fn()
     vi.stubGlobal('window', { fbq })
 
-    trackMetaLead()
+    trackMetaLead({ content_name: 'Teste gratuito de Dosha', content_category: 'dosha_quiz' })
 
-    expect(fbq).toHaveBeenCalledWith('track', 'Lead')
+    expect(fbq).toHaveBeenCalledWith('track', 'Lead', {
+      content_name: 'Teste gratuito de Dosha',
+      content_category: 'dosha_quiz',
+    })
   })
 
   it('não falha quando o Pixel está bloqueado ou indisponível', () => {
     vi.stubGlobal('window', {})
 
-    expect(() => trackMetaLead()).not.toThrow()
+    expect(() => trackMetaLead({ content_name: 'Consulta ayurvédica online', content_category: 'consulta_ayurvedica' })).not.toThrow()
   })
 })
 

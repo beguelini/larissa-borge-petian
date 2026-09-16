@@ -117,7 +117,7 @@ export default function App() {
         body: JSON.stringify(payload),
       })
       if (!response.ok) throw new Error('Falha ao salvar o resultado')
-      trackMetaLead()
+      trackMetaLead({ content_name: 'Teste gratuito de Dosha', content_category: 'dosha_quiz' })
     } catch {
       setSaveWarning(true)
     }

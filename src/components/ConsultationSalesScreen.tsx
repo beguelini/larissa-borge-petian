@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, Clock3, MessageCircleHeart, RotateCcw, Shield
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { quizQuestions } from '../data/questions'
 import { consultationConcernLabels, consultationWhatsAppUrl } from '../lib/consultation'
+import { trackMetaLead } from '../lib/meta-pixel'
 import { scoreQuiz } from '../lib/results'
 import type { LeadFormData, QuizAnswers, QuizResult } from '../types'
 import { FooterLogo } from './FooterLogo'
@@ -50,6 +51,7 @@ export function ConsultationSalesScreen() {
       const response = await fetch('/api/consultation-patients', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, firstName: form.firstName.trim(), email: form.email.trim().toLowerCase(), whatsapp: form.whatsapp.replace(/\D/g, ''), answers: currentAnswers, source: { path: window.location.pathname, referrer: document.referrer || null } }) })
       if (!response.ok) throw new Error('save')
       setCompletedResult(scoreQuiz(currentAnswers))
+      trackMetaLead({ content_name: 'Consulta ayurvédica online', content_category: 'consulta_ayurvedica' })
       setPhase('ready')
     } catch { setError('Não foi possível registrar sua avaliação agora. Tente novamente em alguns instantes.') } finally { setSaving(false) }
   }

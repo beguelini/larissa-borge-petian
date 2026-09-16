@@ -1,6 +1,11 @@
-export function trackMetaLead() {
+type LeadParameters = {
+  content_name: string
+  content_category: 'dosha_quiz' | 'consulta_ayurvedica'
+}
+
+export function trackMetaLead(parameters: LeadParameters) {
   if (typeof window === 'undefined') return
-  window.fbq?.('track', 'Lead')
+  window.fbq?.('track', 'Lead', parameters)
 }
 
 export function trackMetaEbookSalesView() {
