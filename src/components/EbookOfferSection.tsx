@@ -10,6 +10,7 @@ import {
   getEbookOfferSelection,
   type EbookOffer,
 } from '../lib/ebook-offers'
+import { consultationPriceCents, ebookConsultationDiscountedPriceCents, ebookConsultationDiscountPercent, formatConsultationPrice } from '../lib/consultation-pricing'
 
 export function EbookOfferSection() {
   const selection = getEbookOfferSelection()
@@ -21,7 +22,7 @@ export function EbookOfferSection() {
   if (!selection.availableDoshas.length) return null
 
   return (
-    <section className="ebook-offer-section" aria-label="Oferta de e-book Sabores do Meu Ritmo">
+    <section id="ebooks" className="ebook-offer-section" aria-label="Oferta de e-book Sabores do Meu Ritmo">
       <div className="shell ebook-offer-shell">
         <header className="ebook-result-intro">
           <p>Seu resultado é um ponto de partida</p>
@@ -82,6 +83,8 @@ export function EbookOfferSection() {
                   {offer.buttonLabel}<ArrowRight aria-hidden="true" size={20} strokeWidth={1.8} />
                 </a>
               </div>
+              <p className="ebook-consultation-benefit">Ao comprar qualquer edição, sua primeira consulta com a Larissa fica de <strong>{formatConsultationPrice(consultationPriceCents)}</strong> por <strong>{formatConsultationPrice(ebookConsultationDiscountedPriceCents)}</strong>, com {ebookConsultationDiscountPercent}% de desconto. Basta usar na consulta o mesmo e-mail da compra aprovada.</p>
+              <a className="ebook-consultation-link" href="/consulta?ebook-benefit=1&origem=ebook">Já comprei meu e-book e quero usar meu benefício na consulta <ArrowRight aria-hidden="true" size={16} /></a>
 
               <div className="ebook-presentation">
                 {offer.presentation.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}

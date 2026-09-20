@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { hasCompleteAnswers, scoreQuiz } from '../src/lib/results.js'
+import { consultationPriceCents, ebookConsultationDiscountPercent } from '../src/lib/consultation-pricing.js'
 import type { QuizAnswers } from '../src/types.js'
 import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
@@ -27,6 +28,13 @@ async function readBody(request: ApiRequest) { if (request.body !== undefined) r
 function source(value: unknown) { if (!isRecord(value)) return {}; return Object.fromEntries(Object.entries(value).filter(([key, item]) => ['path', 'referrer', 'utmSource', 'utmMedium', 'utmCampaign'].includes(key) && (typeof item === 'string' || item === null)).map(([key, item]) => [key, typeof item === 'string' ? item.slice(0, 500) : null])) }
 function config() { const url = process.env.SUPABASE_URL?.replace(/\/$/, ''); const key = process.env.SUPABASE_SERVICE_ROLE_KEY; return url && key ? { url, key } : null }
 function supabaseHeaders(key: string, extra: Record<string, string> = {}) { return { apikey: key, Authorization: `Bearer ${key}`, ...extra } }
+async function hasApprovedEbookPurchase(db: { url: string; key: string }, email: string) {
+  const params = new URLSearchParams({ select: 'id', buyer_email: `eq.${email}`, event_type: 'eq.PURCHASE_APPROVED', purchase_status: 'eq.APPROVED', product_name: 'ilike.*Sabores do Meu Ritmo*', limit: '1' })
+  const response = await fetch(`${db.url}/rest/v1/hotmart_webhook_events?${params}`, { headers: supabaseHeaders(db.key) })
+  if (!response.ok) throw new Error('ebook-benefit-query')
+  const purchases = await response.json() as unknown[]
+  return purchases.length > 0
+}
 
 export async function handleConsultationPayload(body: unknown) {
   if (!isRecord(body)) return { status: 400, body: { error: 'Dados inválidos.' } }
@@ -36,9 +44,12 @@ export async function handleConsultationPayload(body: unknown) {
   if (body.privacyConsent !== true || !isRecord(body.answers) || !hasCompleteAnswers(body.answers as QuizAnswers)) return { status: 422, body: { error: 'A avaliação e o consentimento são obrigatórios.' } }
   const db = config(); if (!db) return { status: 503, body: { error: 'Serviço temporariamente indisponível.' } }
   const result = scoreQuiz(body.answers as QuizAnswers)
-  const saved = await fetch(`${db.url}/rest/v1/consultation_patients`, { method: 'POST', headers: supabaseHeaders(db.key, { 'Content-Type': 'application/json', Prefer: 'return=minimal' }), body: JSON.stringify({ first_name: body.firstName.trim(), email: body.email.trim().toLowerCase(), whatsapp, main_concern: body.mainConcern, privacy_consent: true, marketing_consent: body.marketingConsent === true, dominant_dosha: result.primary, secondary_dosha: result.secondary, is_balanced: result.isBalanced, scores: result.scores, answers: body.answers, source: source(body.source) }) })
+  const email = body.email.trim().toLowerCase()
+  let ebookConsultationBenefit = false
+  try { ebookConsultationBenefit = await hasApprovedEbookPurchase(db, email) } catch { return { status: 502, body: { error: 'Não foi possível validar o benefício do e-book. Tente novamente em alguns instantes.' } } }
+  const saved = await fetch(`${db.url}/rest/v1/consultation_patients`, { method: 'POST', headers: supabaseHeaders(db.key, { 'Content-Type': 'application/json', Prefer: 'return=minimal' }), body: JSON.stringify({ first_name: body.firstName.trim(), email, whatsapp, main_concern: body.mainConcern, privacy_consent: true, marketing_consent: body.marketingConsent === true, dominant_dosha: result.primary, secondary_dosha: result.secondary, is_balanced: result.isBalanced, scores: result.scores, answers: body.answers, source: source(body.source), unit_price_cents: consultationPriceCents, discount_percent: ebookConsultationBenefit ? ebookConsultationDiscountPercent : 0 }) })
   if (!saved.ok) { console.error('Consultation patient insert failed', saved.status); return { status: 502, body: { error: 'Não foi possível registrar sua avaliação.' } } }
-  return { status: 201, body: { ok: true } }
+  return { status: 201, body: { ok: true, ebookConsultationBenefit, consultationPriceCents } }
 }
 
 export default async function handler(request: ApiRequest, response: ServerResponse) {

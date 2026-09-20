@@ -1,8 +1,10 @@
-import { ArrowUpRight, Camera, Clock3, Info, RotateCcw } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, BookOpenText, Camera, Clock3, HeartHandshake, Info, RotateCcw } from 'lucide-react'
 import type { Dosha, QuizResult } from '../types'
 import { doshaName, getDoshaResultReading } from '../lib/result-content'
 import { EbookOfferSection } from './EbookOfferSection'
 import { FooterLogo } from './FooterLogo'
+import { consultationPriceCents, ebookConsultationDiscountedPriceCents, ebookConsultationDiscountPercent, formatConsultationPrice } from '../lib/consultation-pricing'
+import '../result-conversion.css'
 
 type ResultScreenProps = {
   firstName: string
@@ -86,6 +88,33 @@ export function ResultScreen({ firstName, result, saveWarning, onRestart }: Resu
 
         <p className="education-note"><Info aria-hidden="true" size={17} /> Esta é uma leitura educativa de autoconhecimento, não um diagnóstico.</p>
         {saveWarning && <p className="save-warning" role="status">Seu resultado foi aberto, mas não conseguimos registrar seus dados agora. Tente novamente mais tarde para entrar na lista da Larissa.</p>}
+      </section>
+
+      <section className="result-next-steps" aria-label="Próximos passos">
+        <div className="shell">
+          <header className="result-next-steps-header">
+            <p>Você escolhe o próximo passo</p>
+            <h2>Transforme a sua leitura em cuidado possível.</h2>
+            <span>Comece pela alimentação, aprofunde com uma consulta individual, ou combine os dois no seu tempo.</span>
+          </header>
+          <div className="result-pathways">
+            <a className="result-pathway is-ebook" href="#ebooks">
+              <BookOpenText aria-hidden="true" size={31} strokeWidth={1.5} />
+              <p className="result-pathway-kicker">Para começar agora</p>
+              <h3>Sabores do Meu Ritmo</h3>
+              <span>Três e-books para criar refeições mais estáveis, simples e acolhedoras nos dias em que tudo parece acelerar.</span>
+              <span className="result-pathway-benefit"><strong>{ebookConsultationDiscountPercent}%</strong> na sua primeira consulta, de {formatConsultationPrice(consultationPriceCents)} por {formatConsultationPrice(ebookConsultationDiscountedPriceCents)}.</span>
+              <span className="result-pathway-cta">Escolher minha edição <ArrowRight aria-hidden="true" size={18} /></span>
+            </a>
+            <a className="result-pathway is-consultation" href="/consulta?ebook-benefit=1&origem=resultado-dosha">
+              <HeartHandshake aria-hidden="true" size={31} strokeWidth={1.5} />
+              <p className="result-pathway-kicker">Para ser acompanhada</p>
+              <h3>Consulta individual com Larissa</h3>
+              <span>Uma hora online, um retorno e acompanhamento por WhatsApp para traduzir esta leitura em escolhas que cabem na sua vida.</span>
+              <span className="result-pathway-cta">Quero minha consulta, {formatConsultationPrice(consultationPriceCents)} <ArrowRight aria-hidden="true" size={18} /></span>
+            </a>
+          </div>
+        </div>
       </section>
 
       <EbookOfferSection />

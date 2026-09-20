@@ -15,6 +15,7 @@
     "src/data/**/*.ts",
     "src/lib/result-content.ts",
     "src/lib/results.ts",
+    "src/lib/consultation-pricing.ts",
     "src/types.ts"
   ]
 }

@@ -11,10 +11,10 @@ export function LandingScreen({ onStart }: LandingScreenProps) {
     <div className="landing-screen">
       <section className="hero shell">
         <div className="hero-copy">
-          <h1>Entenda o que o seu corpo está pedindo para você se sentir mais leve</h1>
+          <h1>Descubra o que o seu corpo está pedindo e escolha seu próximo passo com mais clareza</h1>
           <p>
-            Seu corpo dá sinais todos os dias. Faça o teste de doshas gratuito e descubra um primeiro
-            caminho para cuidar de você com mais presença, gentileza e sentido.
+            Seu corpo dá sinais todos os dias. Faça o teste de doshas gratuito e receba uma leitura para
+            começar pela alimentação, avançar para uma consulta individual, ou combinar os dois no seu ritmo.
           </p>
           <button className="primary-button" type="button" onClick={onStart}>
             Fazer meu teste gratuito
