@@ -15,7 +15,7 @@ export function trackMetaEbookSalesView() {
     content_name: 'Sabores do Meu Ritmo',
     content_type: 'product_group',
     currency: 'BRL',
-    value: 47,
+    value: 17.9,
   })
 }
 
@@ -26,6 +26,6 @@ export function trackMetaEbookCheckout(edition: string) {
     content_name: `Sabores do Meu Ritmo — Edição ${edition.charAt(0).toUpperCase()}${edition.slice(1)}`,
     content_type: 'product',
     currency: 'BRL',
-    value: 47,
+    value: 17.9,
   })
 }

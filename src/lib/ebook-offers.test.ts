@@ -6,21 +6,21 @@ describe('e-book offers', () => {
     expect(ebookOffers.vata).toMatchObject({
       editionName: 'Edição Vata',
       imageSrc: '/sabores-meu-ritmo-vata.png',
-      amountInCents: 4700,
+      amountInCents: 1790,
       currency: 'BRL',
       checkoutUrl: 'https://pay.hotmart.com/C107554497T',
     })
     expect(ebookOffers.pitta).toMatchObject({
       editionName: 'Edição Pitta',
       imageSrc: '/sabores-meu-ritmo-pitta.png',
-      amountInCents: 4700,
+      amountInCents: 1790,
       currency: 'BRL',
       checkoutUrl: 'https://pay.hotmart.com/J107554459R',
     })
     expect(ebookOffers.kapha).toMatchObject({
       editionName: 'Edição Kapha',
       imageSrc: '/sabores-meu-ritmo-kapha.png',
-      amountInCents: 4700,
+      amountInCents: 1790,
       currency: 'BRL',
       checkoutUrl: 'https://pay.hotmart.com/A107554541M',
     })
@@ -42,9 +42,9 @@ describe('e-book offers', () => {
     }
   })
 
-  it('formata o valor configurado das três edições como R$47,00', () => {
+  it('formata o valor promocional das três edições como R$17,90', () => {
     for (const offer of Object.values(ebookOffers)) {
-      expect(formatEbookPrice(offer.amountInCents, offer.currency)).toBe('R$47,00')
+      expect(formatEbookPrice(offer.amountInCents, offer.currency)).toBe('R$17,90')
     }
   })
 })
