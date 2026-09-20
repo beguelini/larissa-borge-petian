@@ -1,5 +1,6 @@
 import { ArrowRight, Check, Info } from 'lucide-react'
 import { useState } from 'react'
+import '../ebook-promo.css'
 import type { Dosha } from '../types'
 import {
   ebookEducationNote,
@@ -66,9 +67,11 @@ export function EbookOfferSection() {
 
               <div className="ebook-purchase">
                 <div>
-                  <strong>{formatEbookPrice(offer.amountInCents, offer.currency)}</strong>
+                  <p className="ebook-promo-label">Preço promocional por tempo limitado</p>
+                  <strong>5 x de R$ 3,58</strong>
+                  <span className="ebook-cash-price">ou {formatEbookPrice(offer.amountInCents, offer.currency)} à vista</span>
                   <span>E-book digital • {offer.editionName}</span>
-                  <span className="ebook-installment">12 x de R$ 4,86* no cartão de crédito</span>
+                  <span className="ebook-installment">Parcelamento sem juros* · por menos de R$ 1 por dia para transformar sua rotina através da alimentação nos próximos 7 dias.</span>
                 </div>
                 <a
                   className="product-button ebook-checkout"

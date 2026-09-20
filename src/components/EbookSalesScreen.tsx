@@ -1,5 +1,6 @@
 import { ArrowRight, Check, ChevronDown, HeartHandshake, LockKeyhole, ShoppingBag } from 'lucide-react'
 import { useEffect } from 'react'
+import '../ebook-promo.css'
 import { FooterLogo } from './FooterLogo'
 import { ebookEducationNote, ebookIncludedContent, ebookOffers, formatEbookPrice } from '../lib/ebook-offers'
 import { trackMetaEbookCheckout, trackMetaEbookSalesView } from '../lib/meta-pixel'
@@ -52,6 +53,7 @@ export function EbookSalesScreen() {
           <div className="ebook-sales-hero-copy">
             <h1>Sua rotina alimentar pode ser um lugar de paz.</h1>
             <p>Três e-books com receitas práticas e inspiração do Ayurveda para você deixar o improviso, a culpa e a rigidez de lado — e voltar a comer de um jeito mais possível para a sua vida.</p>
+            <div className="ebook-sales-promo" aria-label="Oferta promocional"><span>Preço promocional por tempo limitado</span><strong>5 x de R$ 3,58</strong><small>ou R$ 17,90 à vista · parcelamento sem juros*</small><p>Por menos de R$ 1 por dia, você pode transformar sua rotina através da alimentação nos próximos 7 dias.</p></div>
             <a className="ebook-sales-primary-action" href="#edicoes">Conhecer as 3 edições <ArrowRight aria-hidden="true" size={21} /></a>
             <small>Conteúdo digital • acesso após a confirmação da compra</small>
           </div>
@@ -98,7 +100,8 @@ export function EbookSalesScreen() {
                   <div>
                     <p>{offer.editionName}</p>
                     <h3>{dosha === 'vata' ? 'Para trazer mais aterramento aos dias corridos.' : dosha === 'pitta' ? 'Para criar leveza quando tudo parece urgente.' : 'Para retomar o movimento com gentileza.'}</h3>
-                    <span>{formatEbookPrice(offer.amountInCents, offer.currency)}</span>
+                    <span>5 x de R$ 3,58</span>
+                    <small className="ebook-edition-promo">ou {formatEbookPrice(offer.amountInCents, offer.currency)} à vista · promoção por tempo limitado</small>
                     <CheckoutButton dosha={dosha} compact />
                   </div>
                 </article>

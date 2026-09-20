@@ -36,7 +36,7 @@ describe('e-book sales tracking', () => {
       content_name: 'Sabores do Meu Ritmo',
       content_type: 'product_group',
       currency: 'BRL',
-      value: 47,
+      value: 17.9,
     }))
   })
 
@@ -49,7 +49,7 @@ describe('e-book sales tracking', () => {
     expect(fbq).toHaveBeenCalledWith('track', 'InitiateCheckout', expect.objectContaining({
       content_ids: ['sabores-meu-ritmo-vata'],
       currency: 'BRL',
-      value: 47,
+      value: 17.9,
     }))
   })
 })
