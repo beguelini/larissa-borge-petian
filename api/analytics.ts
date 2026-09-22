@@ -13,6 +13,8 @@ type LeadSummary = {
   created_at: string
 }
 
+type DateRange = { from: string; to: string }
+
 const headers = {
   'Cache-Control': 'no-store',
   'Content-Type': 'application/json; charset=utf-8',
@@ -26,6 +28,28 @@ function localDate(value: string) {
     month: '2-digit',
     day: '2-digit',
   }).format(new Date(value))
+}
+
+function shiftDate(date: string, days: number) {
+  const value = new Date(`${date}T12:00:00Z`)
+  value.setUTCDate(value.getUTCDate() + days)
+  return value.toISOString().slice(0, 10)
+}
+
+function isDate(value: string | null): value is string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  return new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value
+}
+
+export function defaultDateRange(now = new Date()): DateRange {
+  const to = localDate(now.toISOString())
+  return { from: shiftDate(to, -29), to }
+}
+
+export function requestedDateRange(from: string | null, to: string | null, now = new Date()): DateRange | null {
+  if (!from && !to) return defaultDateRange(now)
+  if (!isDate(from) || !isDate(to) || from > to) return null
+  return { from, to }
 }
 
 function localTime(value: string) {
@@ -46,7 +70,7 @@ function send(response: ServerResponse, status: number, body: Record<string, unk
   response.end(JSON.stringify(body))
 }
 
-export function summarizeLeads(leads: LeadSummary[], now = new Date()) {
+export function summarizeLeads(leads: LeadSummary[], now = new Date(), range = defaultDateRange(now)) {
   const doshas: Record<Dosha, number> = { vata: 0, pitta: 0, kapha: 0 }
   const registrations = new Map<string, number>()
   const today = localDate(now.toISOString())
@@ -80,10 +104,8 @@ export function summarizeLeads(leads: LeadSummary[], now = new Date()) {
     }
   })
 
-  const registrationsByDay = Array.from({ length: 30 }, (_, index) => {
-    const date = new Date(`${today}T12:00:00Z`)
-    date.setUTCDate(date.getUTCDate() - (29 - index))
-    const key = date.toISOString().slice(0, 10)
+  const registrationsByDay = Array.from({ length: Math.round((new Date(`${range.to}T12:00:00Z`).getTime() - new Date(`${range.from}T12:00:00Z`).getTime()) / 86_400_000) + 1 }, (_, index) => {
+    const key = shiftDate(range.from, index)
     return { date: key, count: registrations.get(key) ?? 0 }
   })
 
@@ -115,9 +137,22 @@ export default async function handler(request: ApiRequest, response: ServerRespo
     return
   }
 
+  const requestUrl = new URL(request.url ?? '/', 'http://localhost')
+  const range = requestedDateRange(requestUrl.searchParams.get('from'), requestUrl.searchParams.get('to'))
+  if (!range) {
+    send(response, 422, { error: 'Informe um intervalo de datas válido.' })
+    return
+  }
+
   try {
+    const params = new URLSearchParams({
+      select: 'first_name,dominant_dosha,is_balanced,marketing_consent,created_at',
+      order: 'created_at.desc',
+      limit: '10000',
+      and: `(created_at.gte.${range.from}T00:00:00-03:00,created_at.lt.${shiftDate(range.to, 1)}T00:00:00-03:00)`,
+    })
     const databaseResponse = await fetch(
-      `${supabaseUrl}/rest/v1/dosha_quiz_leads?select=first_name,dominant_dosha,is_balanced,marketing_consent,created_at&order=created_at.desc&limit=10000`,
+      `${supabaseUrl}/rest/v1/dosha_quiz_leads?${params}`,
       {
         headers: {
           apikey: serviceRoleKey,
@@ -133,7 +168,7 @@ export default async function handler(request: ApiRequest, response: ServerRespo
     }
 
     const leads = await databaseResponse.json() as LeadSummary[]
-    send(response, 200, summarizeLeads(leads))
+    send(response, 200, summarizeLeads(leads, new Date(), range))
   } catch {
     send(response, 502, { error: 'Não foi possível carregar os indicadores.' })
   }
