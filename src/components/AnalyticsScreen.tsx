@@ -1,5 +1,5 @@
 import {
-  CalendarDays, ChevronDown, ChevronRight, Flame, Leaf,
+  CalendarDays, ChevronRight, Flame, Leaf,
   RefreshCw, ShieldCheck, Users, Wind,
 } from 'lucide-react'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
@@ -14,22 +14,56 @@ type Analytics = {
   dominantDosha: Dosha | null; doshas: Record<Dosha, number>
   registrationsByDay: DayRegistration[]; recentLeads: RecentLead[]
 }
+type DateRange = { from: string; to: string }
+type DatePreset = 'today' | 'yesterday' | 'thisWeek' | 'last7Days' | 'thisMonth' | 'lastMonth' | 'last30Days' | 'custom'
 
 const doshaLabel: Record<Dosha, string> = { vata: 'Vata', pitta: 'Pitta', kapha: 'Kapha' }
 const doshaClass: Record<Dosha, string> = { vata: 'vata', pitta: 'pitta', kapha: 'kapha' }
 
-function requestAnalytics() {
-  return fetch('/api/analytics').then((response) => {
+function localDate(now = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+}
+
+function shiftDate(date: string, days: number) {
+  const value = new Date(`${date}T12:00:00Z`)
+  value.setUTCDate(value.getUTCDate() + days)
+  return value.toISOString().slice(0, 10)
+}
+
+function defaultDateRange(): DateRange {
+  const to = localDate()
+  return { from: shiftDate(to, -29), to }
+}
+
+function dateRangeFor(preset: Exclude<DatePreset, 'custom'>): DateRange {
+  const today = localDate()
+  if (preset === 'today') return { from: today, to: today }
+  if (preset === 'yesterday') return { from: shiftDate(today, -1), to: shiftDate(today, -1) }
+  if (preset === 'last7Days') return { from: shiftDate(today, -6), to: today }
+  if (preset === 'last30Days') return defaultDateRange()
+  if (preset === 'thisWeek') {
+    const weekday = new Date(`${today}T12:00:00Z`).getUTCDay()
+    return { from: shiftDate(today, -((weekday + 6) % 7)), to: today }
+  }
+  if (preset === 'thisMonth') return { from: `${today.slice(0, 8)}01`, to: today }
+  const currentMonth = new Date(`${today.slice(0, 8)}01T12:00:00Z`)
+  currentMonth.setUTCMonth(currentMonth.getUTCMonth() - 1)
+  const from = currentMonth.toISOString().slice(0, 10)
+  return { from, to: shiftDate(`${today.slice(0, 8)}01`, -1) }
+}
+
+function requestAnalytics(range: DateRange) {
+  const params = new URLSearchParams(range)
+  return fetch(`/api/analytics?${params}`).then((response) => {
     if (response.status === 401) window.location.assign('/login')
     if (!response.ok) throw new Error('Falha ao carregar o painel')
     return response.json() as Promise<Analytics>
   })
 }
 
-function formatRange(days: DayRegistration[]) {
-  if (!days.length) return 'Últimos 30 dias'
+function formatRange(range: DateRange) {
   const format = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  return `${format.format(new Date(`${days[0].date}T12:00:00`))} – ${format.format(new Date(`${days.at(-1)!.date}T12:00:00`))}`
+  return `${format.format(new Date(`${range.from}T12:00:00`))} – ${format.format(new Date(`${range.to}T12:00:00`))}`
 }
 
 function emptyAnalytics(): Analytics {
@@ -37,28 +71,31 @@ function emptyAnalytics(): Analytics {
 }
 
 export function AnalyticsScreen() {
+  const [range, setRange] = useState<DateRange>(defaultDateRange)
+  const [preset, setPreset] = useState<DatePreset>('last30Days')
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  function loadAnalytics() {
+  function loadAnalytics(nextRange = range) {
     setLoading(true); setError('')
-    void requestAnalytics().then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
+    void requestAnalytics(nextRange).then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }
-  useEffect(() => { void requestAnalytics().then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false)) }, [])
+  useEffect(() => { const initialRange = defaultDateRange(); void requestAnalytics(initialRange).then(setAnalytics).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false)) }, [])
 
   const data = analytics ?? emptyAnalytics()
   const totalProfiled = Object.values(data.doshas).reduce((sum, value) => sum + value, 0)
   const maxCount = Math.max(...Object.values(data.doshas), 1)
   const maxDaily = Math.max(...data.registrationsByDay.map(({ count }) => count), 3)
+  const lastDateCount = data.registrationsByDay.at(-1)?.count ?? 0
   const dominantLabel = data.dominantDosha ? doshaLabel[data.dominantDosha] : '—'
   const graph = useMemo(() => chartPath(data.registrationsByDay, maxDaily), [data.registrationsByDay, maxDaily])
 
   return <div className="reference-dashboard" id="painel"><DashboardSidebar active="panel" /><main className="reference-main">
-    <header className="reference-topbar"><h1>Painel de interesse</h1><div className="reference-date-control"><CalendarDays aria-hidden="true" size={19} strokeWidth={1.65} /><span>{formatRange(data.registrationsByDay)}</span><ChevronDown aria-hidden="true" size={18} strokeWidth={1.6} /></div></header>
+    <header className="reference-topbar"><h1>Painel de interesse</h1><form className="reference-date-control" onSubmit={(event) => { event.preventDefault(); loadAnalytics() }}><CalendarDays aria-hidden="true" size={19} strokeWidth={1.65} /><label className="reference-date-preset">Período<select value={preset} onChange={(event) => { const nextPreset = event.target.value as DatePreset; setPreset(nextPreset); if (nextPreset !== 'custom') { const nextRange = dateRangeFor(nextPreset); setRange(nextRange); loadAnalytics(nextRange) } }}><option value="today">Hoje</option><option value="yesterday">Ontem</option><option value="thisWeek">Esta semana</option><option value="last7Days">Últimos 7 dias</option><option value="thisMonth">Este mês</option><option value="lastMonth">Mês passado</option><option value="last30Days">Últimos 30 dias</option><option value="custom">Personalizado</option></select></label><div className="reference-date-fields"><label>De<input type="date" value={range.from} max={range.to} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, from: event.target.value })) }} /></label><span aria-hidden="true">até</span><label>Até<input type="date" value={range.to} min={range.from} max={localDate()} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, to: event.target.value })) }} /></label></div><button type="submit" disabled={loading}>Aplicar</button></form></header>
     {error ? <div className="reference-error" role="alert">{error}</div> : <>
       <section className="reference-metrics" aria-label="Indicadores dos cadastros">
         <Metric icon={<Users />} label="Cadastros" value={data.total} detail="Total no período" />
-        <Metric icon={<CalendarDays />} label="Hoje" value={data.today} detail="Cadastros hoje" />
+        <Metric icon={<CalendarDays />} label="Fim do período" value={lastDateCount} detail={formatRange(range).split(' – ')[1]} />
         <Metric icon={<ShieldCheck />} label={<>Consentimento<br />de marketing</>} value={`${data.marketingConsentRate}%`} detail="Dos cadastros" />
         <Metric icon={<Leaf />} label="Perfil de doshas" value={dominantLabel} detail={data.total ? 'Predominante' : 'Aguardando cadastros'} accent />
       </section>
@@ -71,7 +108,7 @@ export function AnalyticsScreen() {
       </div></section>
       <section className="reference-lower-grid">
         <div className="reference-card reference-chart-card"><h2>Cadastros por dia</h2>{data.registrationsByDay.length ? <RegistrationChart graph={graph} maxDaily={maxDaily} days={data.registrationsByDay} /> : <p className="reference-empty">Os pontos diários aparecerão com os primeiros cadastros.</p>}</div>
-        <div className="reference-card reference-recent-card"><h2>Cadastros recentes</h2>{data.recentLeads.length ? <div className="reference-recent-list">{data.recentLeads.map((lead, index) => <div className="reference-recent-row" key={`${lead.initials}-${index}`}><span className={`reference-initials ${doshaClass[lead.dosha]}`}>{lead.initials}</span><span>{lead.timeLabel}</span><strong className={doshaClass[lead.dosha]}><i />{doshaLabel[lead.dosha]}</strong></div>)}</div> : <p className="reference-empty">Os novos cadastros aparecerão aqui.</p>}<button className="reference-see-all" type="button" onClick={loadAnalytics} disabled={loading}>{loading ? <RefreshCw className="is-spinning" size={16} /> : <>Ver todos <ChevronRight aria-hidden="true" size={18} /></>}</button></div>
+        <div className="reference-card reference-recent-card"><h2>Cadastros recentes</h2>{data.recentLeads.length ? <div className="reference-recent-list">{data.recentLeads.map((lead, index) => <div className="reference-recent-row" key={`${lead.initials}-${index}`}><span className={`reference-initials ${doshaClass[lead.dosha]}`}>{lead.initials}</span><span>{lead.timeLabel}</span><strong className={doshaClass[lead.dosha]}><i />{doshaLabel[lead.dosha]}</strong></div>)}</div> : <p className="reference-empty">Os novos cadastros aparecerão aqui.</p>}<button className="reference-see-all" type="button" onClick={() => loadAnalytics()} disabled={loading}>{loading ? <RefreshCw className="is-spinning" size={16} /> : <>Ver todos <ChevronRight aria-hidden="true" size={18} /></>}</button></div>
       </section>
     </>}<FooterLogo className="reference-footer" />
   </main></div>
