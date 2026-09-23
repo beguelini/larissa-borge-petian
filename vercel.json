@@ -10,6 +10,7 @@
     { "source": "/meu-ritmo", "destination": "/index.html" },
     { "source": "/faturamento-hotmart", "destination": "/index.html" },
     { "source": "/consulta", "destination": "/index.html" },
-    { "source": "/consultas", "destination": "/index.html" }
+    { "source": "/consultas", "destination": "/index.html" },
+    { "source": "/loja", "destination": "/index.html" }
   ]
 }
