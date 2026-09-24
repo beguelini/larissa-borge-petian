@@ -17,14 +17,15 @@ export function MeuRitmoCaptureScreen() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
-  const [consent, setConsent] = useState(false)
+  const [privacyConsent, setPrivacyConsent] = useState(false)
+  const [communicationsConsent, setCommunicationsConsent] = useState(false)
   const [website, setWebsite] = useState('')
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    document.title = 'Meu Ritmo — 21 dias com Ayurveda | Larissa Petian'
+    document.title = 'Meu Ritmo: 21 dias com Ayurveda | Larissa Petian'
     document.querySelector('meta[name="description"]')?.setAttribute('content', '21 dias de Ayurveda para mulheres: roteiros de alimentação e rotina por dosha, aulas de Yoga online e acompanhamento próximo com Larissa Petian.')
   }, [])
 
@@ -44,8 +45,8 @@ export function MeuRitmoCaptureScreen() {
       setError('Digite um WhatsApp brasileiro válido.')
       return
     }
-    if (!consent) {
-      setError('Marque o consentimento para receber as informações do lançamento.')
+    if (!privacyConsent) {
+      setError('Leia a Política de Privacidade e marque o aceite obrigatório para se inscrever.')
       return
     }
 
@@ -59,8 +60,8 @@ export function MeuRitmoCaptureScreen() {
           fullName: fullName.trim(),
           email: email.trim().toLowerCase(),
           whatsapp: whatsapp.replace(/\D/g, ''),
-          privacyConsent: true,
-          communicationsConsent: true,
+          privacyConsent,
+          communicationsConsent,
           website,
           source: {
             path: window.location.pathname,
@@ -75,7 +76,7 @@ export function MeuRitmoCaptureScreen() {
         const result = await response.json() as { error?: string }
         throw new Error(result.error || 'Não foi possível concluir sua inscrição agora.')
       }
-      trackMetaLead({ content_name: 'Meu Ritmo — lista de lançamento', content_category: 'meu_ritmo_prelaunch' })
+      trackMetaLead({ content_name: 'Meu Ritmo: lista de lançamento', content_category: 'meu_ritmo_prelaunch' })
       window.location.assign(prelaunchWhatsAppUrl)
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Não conseguimos concluir sua inscrição agora. Confira sua conexão e tente novamente.')
@@ -86,52 +87,59 @@ export function MeuRitmoCaptureScreen() {
   return (
     <main className="meu-ritmo-capture">
       <header className="meu-ritmo-header shell">
-        <a href="/" aria-label="Larissa Petian — início"><img src="/logo-lp.png" alt="Larissa Petian" /></a>
+        <a href="/" aria-label="Início: Larissa Petian"><img src="/logo-lp.png" alt="Larissa Petian" /></a>
         <span>Ayurveda para a vida real</span>
       </header>
 
       <section className="meu-ritmo-hero shell">
         <div className="meu-ritmo-copy">
           <p className="meu-ritmo-kicker"><Sparkles aria-hidden="true" size={16} /> Uma jornada de 21 dias, só para mulheres</p>
-          <h1>Volte a sentir que a sua rotina também cuida de você.</h1>
-          <p className="meu-ritmo-intro">O Meu Ritmo é uma jornada guiada pela Larissa para reorganizar alimentação e hábitos com os conhecimentos do Ayurveda — em passos possíveis, no seu tempo e na vida real.</p>
+          <h1>Em 21 dias, vire a chave da sua rotina e recupere a disposição.</h1>
+          <p className="meu-ritmo-intro">Alimentação e rotina por dosha, Yoga online e acompanhamento da Larissa para você voltar a se sentir bem no próprio corpo.</p>
           <ul className="meu-ritmo-highlights">
-            <li><Check aria-hidden="true" size={18} /> Roteiros de alimentação e rotina para cada dosha</li>
-            <li><Check aria-hidden="true" size={18} /> Aulas de Yoga online para incluir movimento na semana</li>
-            <li><UsersRound aria-hidden="true" size={18} /> Acompanhamento próximo e comunidade de mulheres</li>
+            <li><Check aria-hidden="true" size={18} /> Roteiros prontos de alimentação e rotina para cada dosha</li>
+            <li><Check aria-hidden="true" size={18} /> Aulas de Yoga online no seu ritmo</li>
+            <li><UsersRound aria-hidden="true" size={18} /> Suporte exclusivo da Larissa em uma comunidade só para mulheres</li>
           </ul>
           <p className="meu-ritmo-guide"><span>Com Larissa Petian</span><small>Terapeuta Ayurveda</small></p>
         </div>
 
         <div className="meu-ritmo-card-wrap">
-          <form id="cadastro" className="meu-ritmo-form" onSubmit={(event) => void submit(event)} noValidate>
-            <p className="meu-ritmo-form-step">PRÉ-LANÇAMENTO · MEU RITMO</p>
-            <h2>Quero saber primeiro</h2>
-            <p className="meu-ritmo-form-intro">Deixe seus dados e entre no grupo oficial para acompanhar o lançamento.</p>
+          <div className="meu-ritmo-card">
+            <div className="meu-ritmo-portrait"><img src="/images/meu-ritmo-larissa.jpg" alt="Larissa Petian, terapeuta Ayurveda e professora de Yoga" /></div>
+            <form id="cadastro" className="meu-ritmo-form" onSubmit={(event) => void submit(event)} noValidate>
+              <p className="meu-ritmo-form-step">PRÉ-LANÇAMENTO · MEU RITMO</p>
+              <h2>Quero saber primeiro</h2>
+              <p className="meu-ritmo-form-intro">Deixe seus dados e entre no grupo oficial para acompanhar o lançamento.</p>
 
-            <label htmlFor="meu-ritmo-name">Seu nome</label>
-            <input id="meu-ritmo-name" name="fullName" autoComplete="name" placeholder="Como podemos chamar você?" value={fullName} onChange={(event) => setFullName(event.target.value)} minLength={2} maxLength={80} required />
+              <label htmlFor="meu-ritmo-name">Seu nome</label>
+              <input id="meu-ritmo-name" name="fullName" autoComplete="name" placeholder="Como podemos chamar você?" value={fullName} onChange={(event) => setFullName(event.target.value)} minLength={2} maxLength={80} required />
 
-            <label htmlFor="meu-ritmo-email">Seu melhor e-mail</label>
-            <input id="meu-ritmo-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="voce@email.com" value={email} onChange={(event) => setEmail(event.target.value)} maxLength={254} required />
+              <label htmlFor="meu-ritmo-email">Seu melhor e-mail</label>
+              <input id="meu-ritmo-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="voce@email.com" value={email} onChange={(event) => setEmail(event.target.value)} maxLength={254} required />
 
-            <label htmlFor="meu-ritmo-whatsapp">Seu WhatsApp</label>
-            <input id="meu-ritmo-whatsapp" name="whatsapp" type="tel" inputMode="tel" autoComplete="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={(event) => setWhatsapp(formatWhatsApp(event.target.value))} required />
+              <label htmlFor="meu-ritmo-whatsapp">Seu WhatsApp</label>
+              <input id="meu-ritmo-whatsapp" name="whatsapp" type="tel" inputMode="tel" autoComplete="tel" placeholder="(11) 99999-9999" value={whatsapp} onChange={(event) => setWhatsapp(formatWhatsApp(event.target.value))} required />
 
-            <label className="meu-ritmo-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} /></label>
+              <label className="meu-ritmo-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} /></label>
 
-            <label className="meu-ritmo-consent">
-              <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
-              <span>Quero receber informações sobre o lançamento por e-mail e WhatsApp. Concordo com o uso dos meus dados conforme a <button type="button" onClick={() => setShowPrivacy(true)}>Política de Privacidade</button>.</span>
-            </label>
+              <label className="meu-ritmo-consent">
+                <input type="checkbox" checked={privacyConsent} onChange={(event) => setPrivacyConsent(event.target.checked)} required aria-required="true" />
+                <span>Autorizo o uso do meu nome, e-mail e WhatsApp para registrar minha inscrição no Meu Ritmo, conforme a <button type="button" onClick={() => setShowPrivacy(true)}>Política de Privacidade</button>. Este aceite é obrigatório.</span>
+              </label>
+              <label className="meu-ritmo-consent meu-ritmo-marketing-consent">
+                <input type="checkbox" checked={communicationsConsent} onChange={(event) => setCommunicationsConsent(event.target.checked)} />
+                <span>Quero receber novidades do lançamento por e-mail e WhatsApp. Opcional, posso retirar este aceite quando quiser.</span>
+              </label>
 
-            {error && <p className="meu-ritmo-error" role="alert">{error}</p>}
-            <button className="meu-ritmo-submit" type="submit" disabled={submitting}>
-              {submitting ? 'Salvando sua inscrição…' : 'Entrar no grupo do WhatsApp'}
-              {!submitting && <ArrowRight aria-hidden="true" size={19} />}
-            </button>
-            <p className="meu-ritmo-privacy"><ShieldCheck aria-hidden="true" size={16} /> Após a inscrição, você será direcionada ao grupo.</p>
-          </form>
+              {error && <p className="meu-ritmo-error" role="alert">{error}</p>}
+              <button className="meu-ritmo-submit" type="submit" disabled={submitting}>
+                {submitting ? 'Salvando sua inscrição…' : 'Entrar no grupo do WhatsApp'}
+                {!submitting && <ArrowRight aria-hidden="true" size={19} />}
+              </button>
+              <p className="meu-ritmo-privacy"><ShieldCheck aria-hidden="true" size={16} /> Após a inscrição, você será direcionada ao grupo.</p>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -205,6 +213,17 @@ export function MeuRitmoCaptureScreen() {
         <div className="meu-ritmo-section-inner meu-ritmo-support-inner">
           <div><p className="meu-ritmo-kicker"><Heart aria-hidden="true" size={16} /> Caminho acompanhado</p><h2>Você não precisa descobrir tudo sozinha.</h2></div>
           <div><p>Ao longo dos 21 dias, a Larissa conduz essa experiência pensada para mulheres: uma combinação de conhecimento ayurvédico, práticas possíveis e um espaço de apoio para seguir um passo de cada vez.</p><p>Sem exigir uma rotina perfeita. Sem transformar autocuidado em mais uma cobrança. A proposta é perceber, experimentar e construir um ritmo que faça sentido para a sua vida.</p><a className="meu-ritmo-cta" href="#cadastro">Quero entrar na lista do lançamento <ArrowRight aria-hidden="true" size={18} /></a></div>
+        </div>
+      </section>
+
+      <section className="meu-ritmo-bio">
+        <div className="meu-ritmo-section-inner meu-ritmo-bio-inner">
+          <img src="/post-biografia.png" alt="Larissa Petian, professora de Hatha e Vinyasa Yoga e terapeuta Ayurveda" />
+          <div>
+            <p className="meu-ritmo-kicker"><Heart aria-hidden="true" size={16} /> Prazer, eu sou a Larissa</p>
+            <h2>Ayurveda para a vida real, com mais escuta e menos regra.</h2>
+            <p>Sou professora de Hatha e Vinyasa Yoga e Terapeuta Ayurveda. Criei o Meu Ritmo para compartilhar uma forma mais gentil, prática e sustentável de olhar para a alimentação e a rotina.</p>
+          </div>
         </div>
       </section>
 
