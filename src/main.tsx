@@ -7,6 +7,7 @@ import '@fontsource/dm-sans/500.css'
 import '@fontsource/dm-sans/600.css'
 import App from './App'
 import './styles.css'
+import './meu-ritmo-capture.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

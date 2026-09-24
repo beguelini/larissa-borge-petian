@@ -10,7 +10,7 @@ function escapeHtml(value: string) {
 
 export function createMemberWelcomeEmail(input: { firstName: string; activationToken: string }) {
   const firstName = escapeHtml(input.firstName)
-  const activationUrl = `https://larissaborgepetian.com.br/meu-ritmo?activation=${encodeURIComponent(input.activationToken)}`
+  const activationUrl = `https://larissaborgepetian.com.br/area-da-aluna?activation=${encodeURIComponent(input.activationToken)}`
   const text = [
     `Seja bem-vinda ao Meu Ritmo, ${input.firstName}.`,
     'Sua inscrição foi confirmada e sua área de aluna está pronta.',

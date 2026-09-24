@@ -25,7 +25,7 @@ export function PrivacyPolicy({ onClose }: PrivacyPolicyProps) {
         <p>Nome, e-mail, WhatsApp, respostas e resultado do questionário, consentimentos e informações básicas de origem da visita.</p>
 
         <h2>Para que usamos</h2>
-        <p>Para liberar sua leitura, entender o interesse no conteúdo da Larissa e enviar o resultado, conteúdos e novidades por e-mail conforme o aceite informado no cadastro.</p>
+        <p>Para liberar sua leitura, organizar os atendimentos e enviar novidades, resultados e informações de lançamento do Meu Ritmo por e-mail e WhatsApp quando você autorizar no cadastro.</p>
 
         <h2>Com quem compartilhamos</h2>
         <p>Os dados são processados pela infraestrutura da Vercel e armazenados no Supabase. Não vendemos seus dados.</p>
