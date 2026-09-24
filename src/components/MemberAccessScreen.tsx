@@ -22,7 +22,7 @@ export function MemberAccessScreen() {
     const data = await response.json() as { error?: string }
     if (response.ok) {
       if (activationToken) {
-        window.history.replaceState({}, '', '/meu-ritmo')
+        window.history.replaceState({}, '', '/area-da-aluna')
         setMember(true)
       } else if (mode === 'register') {
         setMode('login')

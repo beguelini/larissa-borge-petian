@@ -8,6 +8,7 @@
     { "source": "/inscricao", "destination": "/index.html" },
     { "source": "/sabores-do-meu-ritmo", "destination": "/index.html" },
     { "source": "/meu-ritmo", "destination": "/index.html" },
+    { "source": "/area-da-aluna", "destination": "/index.html" },
     { "source": "/faturamento-hotmart", "destination": "/index.html" },
     { "source": "/consulta", "destination": "/index.html" },
     { "source": "/consultas", "destination": "/index.html" },

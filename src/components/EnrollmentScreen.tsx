@@ -55,7 +55,7 @@ export function EnrollmentScreen() {
           <a href="#para-quem">Para quem é</a>
           <a href="#duvidas">Dúvidas</a>
         </nav>
-        <a href="/meu-ritmo">Já sou aluna</a>
+        <a href="/area-da-aluna">Já sou aluna</a>
       </header>
 
       <section className="enrollment-hero shell">

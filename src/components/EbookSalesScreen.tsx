@@ -46,7 +46,7 @@ export function EbookSalesScreen() {
           <img src="/logo-lp.png" alt="Larissa Petian" />
           <span>Sabores do Meu Ritmo</span>
         </a>
-        <a className="ebook-sales-member-link" href="/meu-ritmo">Já tenho meu e-book</a>
+        <a className="ebook-sales-member-link" href="/area-da-aluna">Já tenho meu e-book</a>
       </header>
 
       <section className="ebook-sales-hero">

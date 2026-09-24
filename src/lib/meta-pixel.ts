@@ -1,6 +1,6 @@
 type LeadParameters = {
   content_name: string
-  content_category: 'dosha_quiz' | 'consulta_ayurvedica'
+  content_category: 'dosha_quiz' | 'consulta_ayurvedica' | 'meu_ritmo_prelaunch'
 }
 
 export function trackMetaLead(parameters: LeadParameters) {
