@@ -8,9 +8,16 @@ afterEach(() => {
 })
 
 describe('POST /api/meu-ritmo-leads', () => {
-  it('requires valid contact details and consent before saving', async () => {
+  it('requires valid contact details and privacy consent before saving', async () => {
     const request = vi.spyOn(globalThis, 'fetch')
     const result = await handleMeuRitmoLead({ fullName: 'Ana', email: 'ana@example.com', whatsapp: '(17) 99130-3920', privacyConsent: true })
+    expect(result.status).toBe(422)
+    expect(request).not.toHaveBeenCalled()
+  })
+
+  it('rejects a lead without privacy consent', async () => {
+    const request = vi.spyOn(globalThis, 'fetch')
+    const result = await handleMeuRitmoLead({ fullName: 'Ana', email: 'ana@example.com', whatsapp: '(17) 99130-3920', privacyConsent: false, communicationsConsent: false })
     expect(result.status).toBe(422)
     expect(request).not.toHaveBeenCalled()
   })
@@ -47,5 +54,22 @@ describe('POST /api/meu-ritmo-leads', () => {
     const result = await handleMeuRitmoLead({ website: 'bot' })
     expect(result.status).toBe(201)
     expect(request).not.toHaveBeenCalled()
+  })
+
+  it('stores a lead when optional communications consent is declined', async () => {
+    process.env.SUPABASE_URL = 'https://project.supabase.co'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role'
+    const request = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 201 }))
+    const result = await handleMeuRitmoLead({
+      fullName: 'Ana Maria',
+      email: 'ana@example.com',
+      whatsapp: '(17) 99130-3920',
+      privacyConsent: true,
+      communicationsConsent: false,
+    })
+
+    expect(result.status).toBe(201)
+    const [, init] = request.mock.calls[0]
+    expect(JSON.parse(String(init?.body))).toMatchObject({ privacy_consent: true, communications_consent: false })
   })
 })

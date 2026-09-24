@@ -61,8 +61,8 @@ export async function handleMeuRitmoLead(body: unknown) {
   if (!validName(body.fullName) || !validEmail(body.email) || !whatsapp) {
     return { status: 422, body: { error: 'Informe nome, e-mail e WhatsApp válidos.' } }
   }
-  if (body.privacyConsent !== true || body.communicationsConsent !== true) {
-    return { status: 422, body: { error: 'O consentimento é obrigatório para continuar.' } }
+  if (body.privacyConsent !== true || typeof body.communicationsConsent !== 'boolean') {
+    return { status: 422, body: { error: 'O aceite da Política de Privacidade é obrigatório para continuar.' } }
   }
 
   const url = process.env.SUPABASE_URL?.replace(/\/$/, '')
@@ -84,7 +84,7 @@ export async function handleMeuRitmoLead(body: unknown) {
         email: body.email.trim().toLowerCase(),
         whatsapp,
         privacy_consent: true,
-        communications_consent: true,
+        communications_consent: body.communicationsConsent,
         source: source(body.source),
       }),
     })
