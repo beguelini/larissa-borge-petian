@@ -1,11 +1,12 @@
-import { BadgeDollarSign, HeartHandshake, Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
+import { Activity, BadgeDollarSign, HeartHandshake, Home, LineChart, LogOut, Settings, Users } from 'lucide-react'
 import { BotanicalSprig } from './Illustrations'
 
-type DashboardSection = 'panel' | 'registrations' | 'doshas' | 'settings' | 'finance' | 'consultations'
+type DashboardSection = 'panel' | 'registrations' | 'doshas' | 'settings' | 'finance' | 'consultations' | 'meu-ritmo'
 
 export function DashboardSidebar({ active }: { active: DashboardSection }) {
   const items = [
     { label: 'Painel', icon: Home, href: '/painel', id: 'panel' },
+    { label: 'Meu Ritmo', icon: Activity, href: '/meu-ritmo-performance', id: 'meu-ritmo' },
     { label: 'Cadastros', icon: Users, href: '/cadastros', id: 'registrations' },
     { label: 'Doshas', icon: LineChart, href: '/doshas', id: 'doshas' },
     { label: 'Consultas', icon: HeartHandshake, href: '/consultas', id: 'consultations' },

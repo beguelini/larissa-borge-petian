@@ -12,6 +12,7 @@ import { MeuRitmoCaptureScreen } from './components/MeuRitmoCaptureScreen'
 import { EnrollmentScreen } from './components/EnrollmentScreen'
 import { EbookSalesScreen } from './components/EbookSalesScreen'
 import { HotmartFinanceScreen } from './components/HotmartFinanceScreen'
+import { MeuRitmoPerformanceScreen } from './components/MeuRitmoPerformanceScreen'
 import { ConsultationPatientsScreen } from './components/ConsultationPatientsScreen'
 import { ConsultationSalesScreen } from './components/ConsultationSalesScreen'
 import { LojaScreen } from './components/LojaScreen'
@@ -53,6 +54,7 @@ export default function App() {
   const isEnrollmentRoute = window.location.pathname === '/inscricao'
   const isEbookSalesRoute = window.location.pathname === '/sabores-do-meu-ritmo'
   const isHotmartFinanceRoute = window.location.pathname === '/faturamento-hotmart'
+  const isMeuRitmoPerformanceRoute = window.location.pathname === '/meu-ritmo-performance'
   const isConsultationRoute = window.location.pathname === '/consulta'
   const isConsultationsDashboardRoute = window.location.pathname === '/consultas'
   const isStoreRoute = window.location.pathname === '/loja'
@@ -141,7 +143,7 @@ export default function App() {
 
   return (
     <main>
-      {isMeuRitmoCaptureRoute ? <MeuRitmoCaptureScreen /> : isStoreRoute ? <LojaScreen /> : isConsultationRoute ? <ConsultationSalesScreen /> : isEbookSalesRoute ? <EbookSalesScreen /> : isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isHotmartFinanceRoute ? <DashboardGuard><HotmartFinanceScreen /></DashboardGuard> : isConsultationsDashboardRoute ? <DashboardGuard><ConsultationPatientsScreen /></DashboardGuard> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
+      {isMeuRitmoCaptureRoute ? <MeuRitmoCaptureScreen /> : isStoreRoute ? <LojaScreen /> : isConsultationRoute ? <ConsultationSalesScreen /> : isEbookSalesRoute ? <EbookSalesScreen /> : isEnrollmentRoute ? <EnrollmentScreen /> : isMemberRoute ? <MemberAccessScreen /> : isLoginRoute ? <LoginScreen /> : isHotmartFinanceRoute ? <DashboardGuard><HotmartFinanceScreen /></DashboardGuard> : isMeuRitmoPerformanceRoute ? <DashboardGuard><MeuRitmoPerformanceScreen /></DashboardGuard> : isConsultationsDashboardRoute ? <DashboardGuard><ConsultationPatientsScreen /></DashboardGuard> : isAnalyticsRoute ? <DashboardGuard><AnalyticsScreen /></DashboardGuard> : isRegistrationsRoute ? <DashboardGuard><RegistrationsScreen /></DashboardGuard> : isDoshasRoute ? <DashboardGuard><DoshasScreen /></DashboardGuard> : isSettingsRoute ? <DashboardGuard><SettingsScreen /></DashboardGuard> : <>
       {screen === 'landing' && <LandingScreen onStart={startQuiz} />}
       {screen === 'quiz' && (
         <QuizScreen
