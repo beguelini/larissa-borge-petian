@@ -16,6 +16,7 @@
     { "source": "/meu-ritmo-performance", "destination": "/index.html" },
     { "source": "/consulta", "destination": "/index.html" },
     { "source": "/consultas", "destination": "/index.html" },
-    { "source": "/loja", "destination": "/index.html" }
+    { "source": "/loja", "destination": "/index.html" },
+    { "source": "/site", "destination": "/index.html" }
   ]
 }
