@@ -2,6 +2,7 @@ import { randomBytes, timingSafeEqual } from 'node:crypto'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createActivationToken } from './_lib/member-activation.js'
 import { email, hashMemberPassword } from './_lib/member-auth.js'
+import { createSaleNotificationEmail, sendLarissaNotificationEmail } from './lib/larissa-notification-email.js'
 import { sendMemberWelcomeEmail } from './lib/member-welcome-email.js'
 
 type PurchaseWebhook = { id?: unknown; creation_date?: unknown; event?: unknown; version?: unknown; data?: { buyer?: { name?: unknown; email?: unknown }; product?: { id?: unknown; sku?: unknown; ucode?: unknown; name?: unknown }; commissions?: { value?: unknown; source?: unknown; currency_value?: unknown }[]; purchase?: { transaction?: unknown; status?: unknown; price?: { value?: unknown; currency_value?: unknown }; full_price?: { value?: unknown }; checkout_country?: { name?: unknown }; offer?: { code?: unknown; coupon_code?: unknown }; payment?: { type?: unknown; installments_number?: unknown } } } }
@@ -55,6 +56,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (eventResponse.status === 409) return send(res, 200, { ok: true, duplicate: true })
     if (!eventResponse.ok) throw new Error('event')
     processedEventId = eventId
+
+    if (payload.event === 'PURCHASE_APPROVED' && data.purchase.status === 'APPROVED') {
+      const saleEmail = createSaleNotificationEmail({ productName, transaction, amount: grossAmount, currency: currency ?? 'BRL', occurredAt: createdAt })
+      const notification = await sendLarissaNotificationEmail(saleEmail, `hotmart-approved-sale/${eventId}`)
+      if (!notification.sent) throw new Error(`sale-notification-${notification.reason}`)
+    }
 
     if (payload.event !== 'PURCHASE_APPROVED' || data.purchase.status !== 'APPROVED' || !buyerName || !memberAccessProductId || String(receivedProductId) !== memberAccessProductId) return send(res, 200, { ok: true })
     const activation = createActivationToken()

@@ -54,6 +54,7 @@ describe('POST /api/hotmart-webhook', () => {
     process.env.RESEND_FROM_EMAIL = 'Larissa Petian <ola@larissaborgepetian.com.br>'
     const fetchMock = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(new Response(null, { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'sale_email_123' }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
       .mockResolvedValueOnce(new Response(null, { status: 201 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'email_123' }), { status: 200 }))
@@ -62,9 +63,13 @@ describe('POST /api/hotmart-webhook', () => {
     await handler(request(approvedPurchase), res as never)
 
     expect(res.statusCode).toBe(200)
-    expect(fetchMock).toHaveBeenCalledTimes(4)
-    expect(fetchMock.mock.calls[3][0]).toBe('https://api.resend.com/emails')
-    const message = JSON.parse(String(fetchMock.mock.calls[3][1]?.body)) as Record<string, unknown>
+    expect(fetchMock).toHaveBeenCalledTimes(5)
+    expect(fetchMock.mock.calls[1][0]).toBe('https://api.resend.com/emails')
+    expect(fetchMock.mock.calls[1][1]?.headers).toMatchObject({ 'Idempotency-Key': 'hotmart-approved-sale/event-123' })
+    const saleMessage = JSON.parse(String(fetchMock.mock.calls[1][1]?.body)) as Record<string, unknown>
+    expect(saleMessage.to).toEqual(['lariiptn@gmail.com'])
+    expect(saleMessage.subject).toContain('Meu Ritmo')
+    const message = JSON.parse(String(fetchMock.mock.calls[4][1]?.body)) as Record<string, unknown>
     expect(message.subject).toBe('Seja bem-vinda ao Meu Ritmo, Ana')
     expect(String(message.html)).toContain('Criar minha senha e acessar')
     expect(String(message.html)).toContain('activation=')
@@ -90,14 +95,52 @@ describe('POST /api/hotmart-webhook', () => {
     process.env.HOTMART_HOTTOK = 'hotmart-test-token'
     process.env.SUPABASE_URL = 'https://project.supabase.co'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(null, { status: 201 }))
+    process.env.RESEND_API_KEY = 'resend-test-key'
+    process.env.RESEND_FROM_EMAIL = 'Larissa Petian <ola@larissaborgepetian.com.br>'
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'sale_email_456' }), { status: 200 }))
     const res = response()
     const ebookSale = { ...approvedPurchase, id: 'event-vata-1', data: { ...approvedPurchase.data, product: { id: 99887, name: 'Sabores do Meu Ritmo: Edição Vata' }, purchase: { ...approvedPurchase.data.purchase, transaction: 'HPVATA1' } } }
 
     await handler(request(ebookSale), res as never)
 
     expect(res.statusCode).toBe(200)
-    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toMatchObject({ product_id: '99887', product_name: 'Sabores do Meu Ritmo: Edição Vata' })
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toMatchObject({ to: ['lariiptn@gmail.com'] })
+  })
+
+  it('não envia alerta por atualização de estorno', async () => {
+    process.env.HOTMART_HOTTOK = 'hotmart-test-token'
+    process.env.SUPABASE_URL = 'https://project.supabase.co'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(null, { status: 201 }))
+    const res = response()
+    const refund = { ...approvedPurchase, id: 'event-refund', event: 'PURCHASE_REFUNDED', data: { ...approvedPurchase.data, purchase: { ...approvedPurchase.data.purchase, status: 'REFUNDED' } } }
+
+    await handler(request(refund), res as never)
+
+    expect(res.statusCode).toBe(200)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('permite que a Hotmart tente novamente quando o alerta de venda falhar', async () => {
+    process.env.HOTMART_HOTTOK = 'hotmart-test-token'
+    process.env.SUPABASE_URL = 'https://project.supabase.co'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'server-only-test-key'
+    process.env.RESEND_API_KEY = 'resend-test-key'
+    process.env.RESEND_FROM_EMAIL = 'Larissa Petian <ola@larissaborgepetian.com.br>'
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(null, { status: 201 }))
+      .mockResolvedValueOnce(new Response('{}', { status: 503 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+    const res = response()
+
+    await handler(request(approvedPurchase), res as never)
+
+    expect(res.statusCode).toBe(502)
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    expect(String(fetchMock.mock.calls[2][0])).toContain('/hotmart_webhook_events?hotmart_event_id=eq.event-123')
   })
 })
