@@ -2,7 +2,15 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { requestedDateRange } from './analytics.js'
 import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
-type Lead = { email: string; created_at: string; source: Record<string, unknown> | null }
+type Lead = {
+  full_name: string
+  email: string
+  whatsapp: string
+  privacy_consent: boolean
+  communications_consent: boolean
+  created_at: string
+  source: Record<string, unknown> | null
+}
 type HotmartEvent = {
   event_type: string
   transaction_code: string
@@ -35,23 +43,15 @@ function textValue(value: unknown, fallback: string) {
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : fallback
 }
 
-function productKey(event: HotmartEvent) {
-  return event.product_id?.trim() || `name:${textValue(event.product_name, 'Produto não identificado').toLocaleLowerCase('pt-BR')}`
-}
-
 function isReversal(event: HotmartEvent) {
   return event.event_type === 'PURCHASE_REFUNDED' || event.event_type === 'PURCHASE_CHARGEBACK'
 }
 
-export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent[], selectedProductId: string, range: DateRange) {
-  const products = new Map<string, { id: string; name: string }>()
+export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent[], communityProductId: string, range: DateRange) {
   const transactions = new Map<string, HotmartEvent[]>()
 
   events.forEach((event) => {
-    if (event.event_type === 'PURCHASE_APPROVED') {
-      const id = productKey(event)
-      products.set(id, { id, name: textValue(event.product_name, `Produto ${event.product_id ?? 'não identificado'}`) })
-    }
+    if (event.product_id?.trim() !== communityProductId) return
     const key = event.transaction_code?.trim()
     if (key) transactions.set(key, [...(transactions.get(key) ?? []), event])
   })
@@ -85,10 +85,10 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
   let daysToSaleTotal = 0
   let salesWithLeadDate = 0
 
-  if (selectedProductId && products.has(selectedProductId)) {
+  if (communityProductId) {
     transactions.forEach((group) => {
       const approved = group.find((event) => event.event_type === 'PURCHASE_APPROVED')
-      if (!approved || productKey(approved) !== selectedProductId || !approved.buyer_email || !approved.event_created_at) return
+      if (!approved || approved.product_id?.trim() !== communityProductId || !approved.buyer_email || !approved.event_created_at) return
       const email = approved.buyer_email.trim().toLocaleLowerCase('pt-BR')
       if (!cohortEmails.has(email)) return
       const matchedLeads = leadsByEmail.get(email) ?? []
@@ -129,6 +129,17 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
     refunds: Math.round(refunds * 100) / 100,
     chargebacks: Math.round(chargebacks * 100) / 100,
     averageDaysToSale: salesWithLeadDate ? Math.round((daysToSaleTotal / salesWithLeadDate) * 10) / 10 : null,
+    leadList: leads.map((lead) => ({
+      name: textValue(lead.full_name, 'Sem nome'),
+      email: textValue(lead.email, ''),
+      whatsapp: textValue(lead.whatsapp, ''),
+      createdAt: lead.created_at,
+      privacyConsent: lead.privacy_consent === true,
+      communicationsConsent: lead.communications_consent === true,
+      source: textValue(lead.source?.utmSource, 'Direto ou não informado'),
+      medium: textValue(lead.source?.utmMedium, 'Sem mídia'),
+      campaign: textValue(lead.source?.utmCampaign, 'Sem campanha'),
+    })),
     registrationsByDay: Array.from({ length: Math.round((new Date(`${range.to}T12:00:00Z`).getTime() - new Date(`${range.from}T12:00:00Z`).getTime()) / 86_400_000) + 1 }, (_, index) => {
       const date = new Date(`${range.from}T12:00:00Z`)
       date.setUTCDate(date.getUTCDate() + index)
@@ -136,8 +147,6 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
       return { date: day, count: registrationsByDay.get(day) ?? 0 }
     }),
     attribution: [...attribution.values()].sort((a, b) => b.leads - a.leads).slice(0, 20),
-    products: [...products.entries()].map(([id, product]) => ({ id, name: product.name })).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
-    productSelected: Boolean(selectedProductId && products.has(selectedProductId)),
   }
 }
 
@@ -151,22 +160,23 @@ export default async function handler(request: IncomingMessage, response: Server
 
   const url = process.env.SUPABASE_URL?.replace(/\/$/, '')
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) return send(response, 503, { error: 'Serviço temporariamente indisponível.' })
+  const communityProductId = process.env.HOTMART_PRODUCT_ID?.trim()
+  if (!url || !key || !communityProductId) return send(response, 503, { error: 'Serviço temporariamente indisponível.' })
 
   const requestUrl = new URL(request.url ?? '/', 'http://localhost')
   const range = requestedDateRange(requestUrl.searchParams.get('from'), requestUrl.searchParams.get('to'))
   if (!range) return send(response, 422, { error: 'Informe um intervalo de datas válido.' })
-  const selectedProductId = requestUrl.searchParams.get('productId') ?? ''
   const nextDate = new Date(`${range.to}T12:00:00Z`)
   nextDate.setUTCDate(nextDate.getUTCDate() + 1)
   const leadParams = new URLSearchParams({
-    select: 'email,created_at,source',
+    select: 'full_name,email,whatsapp,privacy_consent,communications_consent,created_at,source',
     order: 'created_at.asc',
     limit: '10000',
     and: `(created_at.gte.${range.from}T00:00:00-03:00,created_at.lt.${nextDate.toISOString().slice(0, 10)}T00:00:00-03:00)`,
   })
   const eventParams = new URLSearchParams({
     select: 'event_type,transaction_code,product_id,product_name,buyer_email,gross_amount,producer_commission,event_created_at',
+    product_id: `eq.${communityProductId}`,
     order: 'event_created_at.desc',
     limit: '10000',
   })
@@ -181,7 +191,7 @@ export default async function handler(request: IncomingMessage, response: Server
       return send(response, 502, { error: 'Não foi possível carregar os indicadores.' })
     }
     const [leads, events] = await Promise.all([leadResponse.json(), eventResponse.json()]) as [Lead[], HotmartEvent[]]
-    send(response, 200, summarizeMeuRitmoPerformance(leads, events, selectedProductId, range))
+    send(response, 200, summarizeMeuRitmoPerformance(leads, events, communityProductId, range))
   } catch {
     send(response, 502, { error: 'Não foi possível carregar os indicadores.' })
   }
