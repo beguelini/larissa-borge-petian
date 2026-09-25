@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { BadgePercent, CalendarDays, CheckCircle2, Clock3, CreditCard, RefreshCw, ShoppingBag, Users } from 'lucide-react'
+import { BadgePercent, CalendarDays, CheckCircle2, Clock3, CreditCard, RefreshCw, Search, ShoppingBag, Users } from 'lucide-react'
 import { DashboardSidebar } from './DashboardSidebar'
 import { FooterLogo } from './FooterLogo'
 
 type DateRange = { from: string; to: string }
 type DatePreset = 'today' | 'yesterday' | 'thisWeek' | 'last7Days' | 'thisMonth' | 'lastMonth' | 'last30Days' | 'custom'
+type LaunchLead = { name: string; email: string; whatsapp: string; createdAt: string; privacyConsent: boolean; communicationsConsent: boolean; source: string; medium: string; campaign: string }
 type Performance = {
   range: DateRange
   leads: number
@@ -17,10 +18,9 @@ type Performance = {
   refunds: number
   chargebacks: number
   averageDaysToSale: number | null
+  leadList: LaunchLead[]
   registrationsByDay: { date: string; count: number }[]
   attribution: { source: string; medium: string; campaign: string; leads: number }[]
-  products: { id: string; name: string }[]
-  productSelected: boolean
 }
 
 function localDate(now = new Date()) {
@@ -63,9 +63,8 @@ function formatRange(range: DateRange) {
   return `${format.format(new Date(`${range.from}T12:00:00`))} a ${format.format(new Date(`${range.to}T12:00:00`))}`
 }
 
-function requestPerformance(range: DateRange, productId: string) {
+function requestPerformance(range: DateRange) {
   const params = new URLSearchParams(range)
-  if (productId) params.set('productId', productId)
   return fetch(`/api/meu-ritmo-performance?${params}`).then((response) => {
     if (response.status === 401) window.location.assign('/login')
     if (!response.ok) throw new Error('Falha ao carregar o painel')
@@ -73,65 +72,65 @@ function requestPerformance(range: DateRange, productId: string) {
   })
 }
 
-function initialProduct(products: Performance['products']) {
-  return products.find(({ name }) => /meu\s+ritmo/i.test(name) && !/sabores/i.test(name))?.id ?? ''
-}
-
 function emptyPerformance(range: DateRange): Performance {
-  return { range, leads: 0, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, registrationsByDay: [], attribution: [], products: [], productSelected: false }
+  return { range, leads: 0, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, leadList: [], registrationsByDay: [], attribution: [] }
 }
 
 export function MeuRitmoPerformanceScreen() {
   const [range, setRange] = useState<DateRange>(defaultDateRange)
   const [preset, setPreset] = useState<DatePreset>('last30Days')
-  const [productId, setProductId] = useState('')
   const [data, setData] = useState<Performance | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
-  function load(nextRange = range, nextProductId = productId) {
+  function load(nextRange = range) {
     setLoading(true)
     setError('')
-    void requestPerformance(nextRange, nextProductId).then((result) => {
-      setData(result)
-      if (!nextProductId) {
-        const suggested = initialProduct(result.products)
-        if (suggested) setProductId(suggested)
-      }
-    }).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
+    void requestPerformance(nextRange).then(setData).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }
 
   useEffect(() => {
     const initialRange = defaultDateRange()
-    void requestPerformance(initialRange, '').then((result) => {
-      setData(result)
-      const suggested = initialProduct(result.products)
-      if (suggested) {
-        setProductId(suggested)
-        return requestPerformance(initialRange, suggested).then(setData)
-      }
-    }).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
+    void requestPerformance(initialRange).then(setData).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }, [])
 
   const result = data ?? emptyPerformance(range)
   const maxDaily = Math.max(...result.registrationsByDay.map(({ count }) => count), 1)
   const chart = useMemo(() => result.registrationsByDay.map(({ date, count }) => ({ date, count, height: Math.max(count ? 8 : 2, Math.round((count / maxDaily) * 100)) })), [result.registrationsByDay, maxDaily])
-  const selectedProduct = result.products.find((product) => product.id === productId)
+  const filteredLeads = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase('pt-BR')
+    if (!term) return result.leadList
+    return result.leadList.filter((lead) => [lead.name, lead.email, lead.whatsapp].some((value) => value.toLocaleLowerCase('pt-BR').includes(term)))
+  }, [result.leadList, search])
+
+  function applyPreset(nextPreset: Exclude<DatePreset, 'custom'>) {
+    const nextRange = dateRangeFor(nextPreset)
+    setPreset(nextPreset)
+    setRange(nextRange)
+    load(nextRange)
+  }
+
+  const presets: { id: Exclude<DatePreset, 'custom'>; label: string }[] = [
+    { id: 'today', label: 'Hoje' }, { id: 'thisWeek', label: 'Esta semana' }, { id: 'last7Days', label: '7 dias' }, { id: 'thisMonth', label: 'Este mês' }, { id: 'last30Days', label: '30 dias' },
+  ]
 
   return <div className="reference-dashboard" id="meu-ritmo-performance"><DashboardSidebar active="meu-ritmo" /><main className="reference-main">
     <header className="reference-topbar meu-ritmo-performance-header">
       <div><p className="mr-kicker">Lançamento · Comunidade</p><h1>Meu Ritmo</h1><p className="mr-subtitle">Acompanhe os leads captados no período e as compras Hotmart feitas depois da inscrição.</p></div>
-      <form className="reference-date-control" onSubmit={(event) => { event.preventDefault(); load() }}><CalendarDays aria-hidden="true" size={19} strokeWidth={1.65} /><label className="reference-date-preset">Período de captação<select value={preset} onChange={(event) => { const nextPreset = event.target.value as DatePreset; setPreset(nextPreset); if (nextPreset !== 'custom') { const nextRange = dateRangeFor(nextPreset); setRange(nextRange); load(nextRange) } }}><option value="today">Hoje</option><option value="yesterday">Ontem</option><option value="thisWeek">Esta semana</option><option value="last7Days">Últimos 7 dias</option><option value="thisMonth">Este mês</option><option value="lastMonth">Mês passado</option><option value="last30Days">Últimos 30 dias</option><option value="custom">Personalizado</option></select></label><div className="reference-date-fields"><label>De<input type="date" value={range.from} max={range.to} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, from: event.target.value })) }} /></label><span aria-hidden="true">até</span><label>Até<input type="date" value={range.to} min={range.from} max={localDate()} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, to: event.target.value })) }} /></label></div><button type="submit" disabled={loading}>Aplicar</button></form>
+      <div className="mr-date-panel">
+        <div className="mr-date-heading"><span><CalendarDays aria-hidden="true" size={17} /> Período de captação</span><small>{formatRange(range)}</small></div>
+        <div className="mr-date-presets" role="group" aria-label="Períodos rápidos">{presets.map(({ id, label }) => <button className={preset === id ? 'is-active' : ''} type="button" key={id} onClick={() => applyPreset(id)} aria-pressed={preset === id}>{label}</button>)}<button className={preset === 'custom' ? 'is-active' : ''} type="button" onClick={() => setPreset('custom')} aria-pressed={preset === 'custom'}>Personalizado</button></div>
+        <form className="mr-date-form" onSubmit={(event) => { event.preventDefault(); load() }}><label>De<input type="date" value={range.from} max={range.to} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, from: event.target.value })) }} /></label><span aria-hidden="true">até</span><label>Até<input type="date" value={range.to} min={range.from} max={localDate()} onChange={(event) => { setPreset('custom'); setRange((current) => ({ ...current, to: event.target.value })) }} /></label><button type="submit" disabled={loading}>{loading ? 'Atualizando…' : 'Aplicar período'}</button></form>
+      </div>
     </header>
-    <div className="mr-product-bar"><label htmlFor="mr-product"><ShoppingBag aria-hidden="true" size={18} /> Produto da comunidade</label><select id="mr-product" value={productId} onChange={(event) => { setProductId(event.target.value); load(range, event.target.value) }} disabled={!result.products.length || loading}><option value="">Selecione o produto vendido na Hotmart</option>{result.products.map((product) => <option value={product.id} key={product.id}>{product.name}</option>)}</select><small>Janela de captação: {formatRange(range)} · as vendas são acompanhadas após cada cadastro.</small></div>
     {error ? <div className="reference-error" role="alert">{error}</div> : <>
-      {!result.products.length && <div className="mr-status-banner" role="status"><CreditCard aria-hidden="true" size={20} /><span><strong>Vendas da comunidade ainda não identificadas</strong>Quando a Hotmart registrar a primeira compra aprovada, escolha aqui o produto Meu Ritmo para acompanhar conversão e receita. Outros produtos, como os e-books, não serão atribuídos à comunidade automaticamente.</span></div>}
-      {result.products.length > 0 && !productId && <div className="mr-status-banner" role="status"><CreditCard aria-hidden="true" size={20} /><span><strong>Selecione o produto da comunidade</strong>Os indicadores de venda ficam em zero até a escolha do produto correto. Compras de e-books não são incluídas sem essa confirmação.</span></div>}
+      {result.orders === 0 && <div className="mr-status-banner" role="status"><CreditCard aria-hidden="true" size={20} /><span><strong>Nenhuma venda da comunidade no período</strong>Quando houver uma compra aprovada do Meu Ritmo após a inscrição, a conversão e a receita serão atualizadas automaticamente pelo webhook Hotmart.</span></div>}
       <section className="reference-metrics mr-metrics" aria-label="Indicadores de captação e venda">
         <Metric icon={<Users />} label="Leads captados" value={result.leads} detail={`${result.uniqueLeads} e-mails únicos`} />
         <Metric icon={<CheckCircle2 />} label="Leads convertidos" value={result.convertedLeads} detail="Compra aprovada após cadastro" />
         <Metric icon={<BadgePercent />} label="Conversão" value={`${result.conversionRate}%`} detail="Da base única de leads" accent />
-        <Metric icon={<ShoppingBag />} label="Pedidos ativos" value={result.orders} detail={selectedProduct?.name ?? 'Produto da comunidade'} />
+        <Metric icon={<ShoppingBag />} label="Pedidos ativos" value={result.orders} detail="Comunidade Meu Ritmo" />
       </section>
       <section className="reference-metrics mr-finance-metrics" aria-label="Indicadores financeiros da comunidade">
         <Metric icon={<CreditCard />} label="Receita bruta" value={formatMoney(result.grossRevenue)} detail="Pedidos aprovados ativos" />
@@ -142,6 +141,11 @@ export function MeuRitmoPerformanceScreen() {
       <section className="mr-insights-grid">
         <article className="reference-card mr-daily-card"><h2>Captação por dia</h2><p>Leads inscritos em cada data do período escolhido.</p>{chart.length ? <div className="mr-bar-chart" role="img" aria-label="Gráfico de leads captados por dia">{chart.map(({ date, count, height }) => <div className="mr-bar-column" key={date} title={`${date}: ${count} leads`}><span>{count || ''}</span><i style={{ height: `${height}%` }} /><small>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(`${date}T12:00:00`))}</small></div>)}</div> : <p className="reference-empty">Os cadastros aparecerão aqui.</p>}</article>
         <article className="reference-card mr-sources-card"><h2>Origem dos leads</h2><p>Campanha, fonte e mídia registrados no formulário.</p>{result.attribution.length ? <div className="mr-source-list">{result.attribution.map((source, index) => <div className="mr-source-row" key={`${source.source}-${source.medium}-${source.campaign}-${index}`}><span><strong>{source.campaign}</strong><small>{source.source} · {source.medium}</small></span><b>{source.leads}</b></div>)}</div> : <p className="reference-empty">Ainda não há parâmetros de campanha nos cadastros deste período.</p>}</article>
+      </section>
+      <section className="mr-leads-card" aria-labelledby="mr-leads-title">
+        <div className="mr-leads-heading"><div><p className="mr-kicker">Base de captação</p><h2 id="mr-leads-title">Leads do Meu Ritmo <span>{result.leads}</span></h2><p>Dados informados no formulário entre {formatRange(range)}.</p></div><label className="mr-leads-search"><Search size={17} aria-hidden="true" /><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar nome, e-mail ou WhatsApp" aria-label="Buscar leads" /></label></div>
+        <div className="mr-leads-table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Cadastro</th><th>Origem</th><th>Privacidade</th><th>Informativos</th></tr></thead><tbody>{filteredLeads.map((lead) => <tr key={`${lead.createdAt}-${lead.email}`}><td><strong>{lead.name}</strong></td><td><a href={`mailto:${lead.email}`}>{lead.email}</a></td><td><a href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer">{lead.whatsapp}</a></td><td>{new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(lead.createdAt))}</td><td><strong>{lead.campaign}</strong><small>{lead.source} · {lead.medium}</small></td><td>{lead.privacyConsent ? 'Aceito' : 'Não registrado'}</td><td>{lead.communicationsConsent ? 'Sim' : 'Não'}</td></tr>)}{filteredLeads.length === 0 && <tr><td colSpan={7} className="mr-leads-empty">{result.leadList.length ? 'Nenhum lead corresponde à busca.' : 'Ainda não há leads neste período.'}</td></tr>}</tbody></table></div>
+        <div className="mr-leads-footer"><span>{filteredLeads.length} de {result.leads} cadastros</span><button type="button" onClick={() => load()} disabled={loading}><RefreshCw size={15} aria-hidden="true" className={loading ? 'mr-refreshing' : ''} /> Atualizar lista</button></div>
       </section>
       <p className="mr-data-note">A atribuição de venda usa correspondência exata de e-mail entre o cadastro e a compra. Os indicadores de vendas consideram pedidos aprovados depois da inscrição e deixam reembolsos e chargebacks fora da conversão ativa. O repasse só é exibido quando informado pela Hotmart.</p>
     </>}
