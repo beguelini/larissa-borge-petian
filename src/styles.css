@@ -365,6 +365,15 @@ button {
 .mr-leads-footer button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; border: 0; border-radius: 5px; background: transparent; color: #486546; font-size: .73rem; font-weight: 650; cursor: pointer; }
 .mr-leads-footer button:disabled { opacity: .6; cursor: wait; }
 .mr-refreshing { animation: mr-rotate .85s linear infinite; }
+.mr-bar-chart { scrollbar-width: thin; scrollbar-color: #c9d2c2 transparent; padding-right: 14px; padding-left: 14px; }
+.mr-bar-column i { transition: background .15s, opacity .15s; }
+.mr-bar-column:hover i { background: #527344; }
+.mr-bar-column small { left: 50%; min-height: 1em; transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.mr-bar-column:not(.has-date-label) small { visibility: hidden; }
+.mr-whatsapp-link { display: inline-flex; min-height: 34px; align-items: center; gap: 7px; padding: 0 9px; border: 1px solid #dce9dd; border-radius: 999px; background: #f1f7f0; color: #227345 !important; font-size: .73rem; font-weight: 650; white-space: nowrap; transition: border-color .15s, background .15s, transform .15s; }
+.mr-whatsapp-link:hover { border-color: #acd0b2; background: #e5f2e6; text-decoration: none !important; transform: translateY(-1px); }
+.mr-whatsapp-link:focus-visible { outline: 3px solid rgba(37, 128, 72, .22); outline-offset: 2px; }
+.mr-whatsapp-link svg { width: 17px; height: 17px; flex: 0 0 auto; }
 @keyframes mr-rotate { to { transform: rotate(360deg); } }
 @media (max-width: 980px) { .mr-insights-grid { grid-template-columns: 1fr; } }
 @media (max-width: 620px) { .reference-sidebar nav { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }.reference-sidebar nav::-webkit-scrollbar { display: none; }.reference-nav-item { flex: 0 0 38px; }.mr-status-banner { padding: 14px; font-size: .86rem; }.mr-insights-grid { gap: 12px; margin-top: 14px; }.mr-insights-grid .reference-card { min-height: 280px; }.mr-bar-chart { gap: 3px; }.mr-bar-column { min-width: 13px; flex-basis: 13px; }.mr-bar-column small { font-size: .55rem; }.mr-date-panel { padding: 16px 14px; }.mr-date-heading { align-items: flex-start; flex-direction: column; gap: 5px; }.mr-date-presets { gap: 6px; }.mr-date-presets button { min-height: 32px; padding: 0 10px; font-size: .7rem; }.mr-date-form { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }.mr-date-form input { width: 100%; }.mr-date-form > span { display: none; }.mr-date-form button { grid-column: 1 / -1; width: 100%; margin: 2px 0 0; }.mr-leads-card { margin-top: 15px; }.mr-leads-heading { align-items: stretch; flex-direction: column; gap: 14px; padding: 18px 15px; }.mr-leads-heading h2 { font-size: 1.5rem; }.mr-leads-search { width: 100%; }.mr-leads-footer { padding: 11px 12px; } }
