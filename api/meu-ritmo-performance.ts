@@ -3,6 +3,7 @@ import { requestedDateRange } from './analytics.js'
 import { requireDashboardSession } from './_lib/dashboard-auth.js'
 
 type Lead = {
+  id: string
   full_name: string
   email: string
   whatsapp: string
@@ -130,6 +131,7 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
     chargebacks: Math.round(chargebacks * 100) / 100,
     averageDaysToSale: salesWithLeadDate ? Math.round((daysToSaleTotal / salesWithLeadDate) * 10) / 10 : null,
     leadList: leads.map((lead) => ({
+      id: lead.id,
       name: textValue(lead.full_name, 'Sem nome'),
       email: textValue(lead.email, ''),
       whatsapp: textValue(lead.whatsapp, ''),
@@ -151,8 +153,8 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
 }
 
 export default async function handler(request: IncomingMessage, response: ServerResponse) {
-  if (request.method !== 'GET') {
-    response.setHeader('Allow', 'GET')
+  if (!['GET', 'DELETE'].includes(request.method ?? '')) {
+    response.setHeader('Allow', 'GET, DELETE')
     send(response, 405, { error: 'Método não permitido.' })
     return
   }
@@ -160,16 +162,32 @@ export default async function handler(request: IncomingMessage, response: Server
 
   const url = process.env.SUPABASE_URL?.replace(/\/$/, '')
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  const communityProductId = process.env.HOTMART_PRODUCT_ID?.trim()
-  if (!url || !key || !communityProductId) return send(response, 503, { error: 'Serviço temporariamente indisponível.' })
+  if (!url || !key) return send(response, 503, { error: 'Serviço temporariamente indisponível.' })
 
   const requestUrl = new URL(request.url ?? '/', 'http://localhost')
+  if (request.method === 'DELETE') {
+    const id = requestUrl.searchParams.get('id')
+    if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return send(response, 422, { error: 'Lead inválido.' })
+    try {
+      const deleted = await fetch(`${url}/rest/v1/meu_ritmo_launch_leads?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: 'return=representation' },
+      })
+      if (!deleted.ok) throw new Error('delete')
+      if (!(await deleted.json() as { id: string }[]).length) return send(response, 404, { error: 'Lead não encontrado.' })
+      return send(response, 200, { ok: true })
+    } catch {
+      return send(response, 502, { error: 'Não foi possível excluir o lead.' })
+    }
+  }
+  const communityProductId = process.env.HOTMART_PRODUCT_ID?.trim()
+  if (!communityProductId) return send(response, 503, { error: 'Serviço temporariamente indisponível.' })
   const range = requestedDateRange(requestUrl.searchParams.get('from'), requestUrl.searchParams.get('to'))
   if (!range) return send(response, 422, { error: 'Informe um intervalo de datas válido.' })
   const nextDate = new Date(`${range.to}T12:00:00Z`)
   nextDate.setUTCDate(nextDate.getUTCDate() + 1)
   const leadParams = new URLSearchParams({
-    select: 'full_name,email,whatsapp,privacy_consent,communications_consent,created_at,source',
+    select: 'id,full_name,email,whatsapp,privacy_consent,communications_consent,created_at,source',
     order: 'created_at.asc',
     limit: '10000',
     and: `(created_at.gte.${range.from}T00:00:00-03:00,created_at.lt.${nextDate.toISOString().slice(0, 10)}T00:00:00-03:00)`,
