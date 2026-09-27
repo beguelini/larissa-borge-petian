@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { BadgePercent, CalendarDays, CheckCircle2, Clock3, CreditCard, RefreshCw, Search, ShoppingBag, Trash2, Users } from 'lucide-react'
 import { DashboardSidebar } from './DashboardSidebar'
 import { FooterLogo } from './FooterLogo'
@@ -13,6 +13,9 @@ type Performance = {
   leads: number
   paidTrafficLeads: number
   paidTrafficPercent: number
+  paidUniqueLeads: number
+  paidConvertedLeads: number
+  paidConversionRate: number | null
   uniqueLeads: number
   convertedLeads: number
   conversionRate: number
@@ -66,6 +69,19 @@ function formatPercent(value: number) {
   return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(value)}%`
 }
 
+function formatMultiple(value: number | null) {
+  return value === null ? 'Sem base' : `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value)}x`
+}
+
+function daysBetween(from: string, to: string) {
+  return Math.round((new Date(`${to}T12:00:00Z`).getTime() - new Date(`${from}T12:00:00Z`).getTime()) / 86_400_000)
+}
+
+function savedCampaignStart() {
+  const saved = window.localStorage.getItem('meu-ritmo-campaign-start')
+  return saved && /^\d{4}-\d{2}-\d{2}$/.test(saved) ? saved : localDate()
+}
+
 function formatPlacement(value: string) {
   const normalized = value.toLocaleLowerCase('pt-BR')
   if (normalized.includes('reel')) return 'Reels'
@@ -89,13 +105,16 @@ function requestPerformance(range: DateRange) {
 }
 
 function emptyPerformance(range: DateRange): Performance {
-  return { range, leads: 0, paidTrafficLeads: 0, paidTrafficPercent: 0, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, leadList: [], registrationsByDay: [], attribution: [] }
+  return { range, leads: 0, paidTrafficLeads: 0, paidTrafficPercent: 0, paidUniqueLeads: 0, paidConvertedLeads: 0, paidConversionRate: null, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, leadList: [], registrationsByDay: [], attribution: [] }
 }
 
 export function MeuRitmoPerformanceScreen() {
   const [range, setRange] = useState<DateRange>(defaultDateRange)
   const [preset, setPreset] = useState<DatePreset>('last30Days')
   const [data, setData] = useState<Performance | null>(null)
+  const [campaignStart, setCampaignStart] = useState(savedCampaignStart)
+  const [campaignData, setCampaignData] = useState<Performance | null>(null)
+  const [today, setToday] = useState(localDate)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -107,12 +126,64 @@ export function MeuRitmoPerformanceScreen() {
     void requestPerformance(nextRange).then(setData).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }
 
+  const loadCampaign = useCallback((start = campaignStart) => {
+    const campaignRange = { from: start, to: shiftDate(start, 14) }
+    void requestPerformance(campaignRange).then(setCampaignData).catch(() => setCampaignData(emptyPerformance(campaignRange)))
+  }, [campaignStart])
+
   useEffect(() => {
     const initialRange = defaultDateRange()
     void requestPerformance(initialRange).then(setData).catch(() => setError('Não foi possível carregar os indicadores agora.')).finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    loadCampaign(campaignStart)
+    window.localStorage.setItem('meu-ritmo-campaign-start', campaignStart)
+  }, [campaignStart, loadCampaign])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      const nextToday = localDate()
+      if (nextToday !== today) {
+        setToday(nextToday)
+        loadCampaign()
+      }
+    }, 60_000)
+    return () => window.clearInterval(timer)
+  }, [campaignStart, today, loadCampaign])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void requestPerformance(range).then(setData).catch(() => setError('Não foi possível atualizar os indicadores agora.'))
+      void requestPerformance({ from: campaignStart, to: shiftDate(campaignStart, 14) }).then(setCampaignData).catch(() => setCampaignData(emptyPerformance({ from: campaignStart, to: shiftDate(campaignStart, 14) })))
+    }, 300_000)
+    return () => window.clearInterval(timer)
+  }, [range, campaignStart])
+
   const result = data ?? emptyPerformance(range)
+  const elapsedDays = Math.max(0, Math.min(15, daysBetween(campaignStart, today) + 1))
+  const paidLeadsByDay = useMemo(() => {
+    const counts = new Map<string, number>()
+    campaignData?.leadList.filter((lead) => lead.paid).forEach((lead) => {
+      const day = localDate(new Date(lead.createdAt))
+      counts.set(day, (counts.get(day) ?? 0) + 1)
+    })
+    return counts
+  }, [campaignData])
+  const campaignPaidLeads = [...paidLeadsByDay.values()].reduce((sum, count) => sum + count, 0)
+  const campaignAverageCpl = elapsedDays && campaignPaidLeads ? (elapsedDays * 50) / campaignPaidLeads : null
+  const estimatedCampaignLeads = campaignAverageCpl ? (15 * 50) / campaignAverageCpl : null
+  const expectedCampaignSales = estimatedCampaignLeads !== null && result.paidConversionRate !== null ? estimatedCampaignLeads * (result.paidConversionRate / 100) : null
+  const expectedCampaignRevenue = expectedCampaignSales === null ? null : expectedCampaignSales * 397
+  const expectedCampaignRoas = expectedCampaignRevenue === null ? null : expectedCampaignRevenue / 750
+  const dailyProjection = Array.from({ length: 15 }, (_, index) => {
+    const date = shiftDate(campaignStart, index)
+    const paidLeads = paidLeadsByDay.get(date) ?? 0
+    const cpl = paidLeads ? 50 / paidLeads : campaignAverageCpl
+    const expectedLeads = date < today ? paidLeads : cpl ? 50 / cpl : 0
+    const expectedRoas = cpl && result.paidConversionRate !== null ? (expectedLeads * (result.paidConversionRate / 100) * 397) / 50 : null
+    return { date, paidLeads, cpl: paidLeads ? 50 / paidLeads : null, expectedLeads, expectedRoas }
+  })
   const maxDaily = Math.max(...result.registrationsByDay.map(({ count }) => count), 1)
   const chart = useMemo(() => result.registrationsByDay.map(({ date, count }, index, days) => ({
     date,
@@ -164,6 +235,17 @@ export function MeuRitmoPerformanceScreen() {
     </header>
     {error ? <div className="reference-error" role="alert">{error}</div> : <>
       {result.orders === 0 && <div className="mr-status-banner" role="status"><CreditCard aria-hidden="true" size={20} /><span><strong>Nenhuma venda da comunidade no período</strong>Quando houver uma compra aprovada do Meu Ritmo após a inscrição, a conversão e a receita serão atualizadas automaticamente pelo webhook Hotmart.</span></div>}
+      <section className="mr-campaign-card reference-card" aria-labelledby="mr-campaign-title">
+        <div className="mr-campaign-heading"><div><p className="mr-kicker">Planejamento de mídia</p><h2 id="mr-campaign-title">Projeção da campanha de 15 dias</h2><p>Leads e compras são atualizados pelo painel. A verba abaixo é o orçamento planejado.</p></div><label>Início da campanha<input type="date" value={campaignStart} onChange={(event) => setCampaignStart(event.target.value || localDate())} /></label><button className="mr-campaign-refresh" type="button" onClick={() => { load(); loadCampaign() }}><RefreshCw size={15} aria-hidden="true" /> Atualizar projeção</button></div>
+        <div className="mr-campaign-metrics">
+          <Metric icon={<CreditCard />} label="Verba planejada" value={formatMoney(750)} detail="R$ 50 por dia durante 15 dias" />
+          <Metric icon={<Users />} label="Leads projetados" value={estimatedCampaignLeads === null ? 'Aguardando leads' : new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(estimatedCampaignLeads)} detail={campaignAverageCpl === null ? 'A projeção começa após os primeiros leads pagos' : `Com CPL médio de ${formatMoney(campaignAverageCpl)}`} />
+          <Metric icon={<BadgePercent />} label="CPL médio" value={campaignAverageCpl === null ? 'Sem dados' : formatMoney(campaignAverageCpl)} detail={`${campaignPaidLeads} leads pagos em ${elapsedDays} dia(s)`} />
+          <Metric icon={<ShoppingBag />} label="ROAS esperado" value={formatMultiple(expectedCampaignRoas)} detail={expectedCampaignSales === null ? 'Aguardando base de conversão paga' : `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(expectedCampaignSales)} venda(s) estimada(s)`} accent />
+        </div>
+        <div className="mr-campaign-table-wrap"><table><thead><tr><th>Dia</th><th>Data</th><th>Orçamento</th><th>Leads pagos</th><th>CPL do dia</th><th>ROAS estimado</th></tr></thead><tbody>{dailyProjection.map(({ date, paidLeads, expectedLeads, cpl, expectedRoas }, index) => <tr key={date}><td>{index + 1}</td><td>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`))}{date === today && <small className="mr-campaign-today">Hoje</small>}</td><td>{formatMoney(50)}</td><td>{date > today ? (campaignAverageCpl === null ? 'Aguardando' : new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(expectedLeads)) : paidLeads}</td><td>{paidLeads ? formatMoney(cpl as number) : date > today && campaignAverageCpl ? `${formatMoney(campaignAverageCpl)} proj.` : 'Sem leads'}</td><td>{formatMultiple(expectedRoas)}</td></tr>)}</tbody></table></div>
+        <p className="mr-campaign-note">Estimativa usa o CPL observado nesta campanha e a conversão de leads pagos em compras Hotmart no período selecionado acima ({result.paidConvertedLeads} compras em {result.paidUniqueLeads} leads pagos{result.paidConversionRate === null ? '' : `, ${formatPercent(result.paidConversionRate)}`}). O ROAS considera o preço de R$ 397 e a verba planejada, sem descontar taxas. Ponto de equilíbrio bruto: 2 vendas.</p>
+      </section>
       <section className="reference-metrics mr-metrics" aria-label="Indicadores de captação e venda">
         <Metric icon={<Users />} label="Leads captados" value={result.leads} detail={`${result.uniqueLeads} e-mails únicos`} />
         <Metric icon={<CheckCircle2 />} label="Leads convertidos" value={result.convertedLeads} detail="Compra aprovada após cadastro" />

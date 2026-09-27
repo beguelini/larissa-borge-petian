@@ -98,7 +98,11 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
   })
 
   const cohortEmails = new Set(leadsByEmail.keys())
+  const paidEmails = new Set([...leadsByEmail.entries()]
+    .filter(([, cohort]) => isPaidMedium([...cohort].sort((a, b) => a.created_at.localeCompare(b.created_at))[0]?.source?.utmMedium))
+    .map(([email]) => email))
   const convertedEmails = new Set<string>()
+  const paidConvertedEmails = new Set<string>()
   let orders = 0
   let grossRevenue = 0
   let netRevenue = 0
@@ -134,6 +138,7 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
       if (reportedNet > 0) netRevenue += reportedNet
       else missingNetValue = true
       convertedEmails.add(email)
+      if (isPaidMedium(acquisition.source?.utmMedium)) paidConvertedEmails.add(email)
       daysToSaleTotal += Math.max(0, new Date(approved.event_created_at).getTime() - new Date(acquisition.created_at).getTime()) / 86_400_000
       salesWithLeadDate += 1
     })
@@ -146,6 +151,9 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
     leads: leads.length,
     paidTrafficLeads,
     paidTrafficPercent: leads.length ? Math.round((paidTrafficLeads / leads.length) * 1000) / 10 : 0,
+    paidUniqueLeads: paidEmails.size,
+    paidConvertedLeads: paidConvertedEmails.size,
+    paidConversionRate: paidEmails.size ? Math.round((paidConvertedEmails.size / paidEmails.size) * 1000) / 10 : null,
     uniqueLeads,
     convertedLeads: convertedEmails.size,
     conversionRate: uniqueLeads ? Math.round((convertedEmails.size / uniqueLeads) * 1000) / 10 : 0,

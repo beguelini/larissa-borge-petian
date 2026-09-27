@@ -23,6 +23,9 @@ describe('summarizeMeuRitmoPerformance', () => {
     expect(result.netRevenue).toBe(270)
     expect(result.paidTrafficLeads).toBe(1)
     expect(result.paidTrafficPercent).toBe(50)
+    expect(result.paidUniqueLeads).toBe(1)
+    expect(result.paidConvertedLeads).toBe(1)
+    expect(result.paidConversionRate).toBe(100)
     expect(result.attribution[0]).toMatchObject({ source: 'ig', medium: 'paid', campaign: 'meu-ritmo', placement: 'Instagram Reels', ad: 'Vídeo rotina', platform: 'instagram', paid: true, leads: 1, percent: 50 })
     expect(result.leadList).toHaveLength(2)
     expect(result.leadList[0]).toMatchObject({ name: 'Ana', email: 'ana@example.com', whatsapp: '5511999999999', privacyConsent: true, communicationsConsent: true, platform: 'instagram', paid: true, campaign: 'meu-ritmo', placement: 'Instagram Reels', ad: 'Vídeo rotina' })
@@ -43,6 +46,7 @@ describe('summarizeMeuRitmoPerformance', () => {
     expect(result.orders).toBe(0)
     expect(result.refunds).toBe(297)
     expect(result.netRevenue).toBeNull()
+    expect(result.paidConversionRate).toBeNull()
   })
 
   it('only attributes the configured community product and ignores e-book purchases', () => {
