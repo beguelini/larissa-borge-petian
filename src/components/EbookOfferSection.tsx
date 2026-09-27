@@ -26,7 +26,7 @@ export function EbookOfferSection() {
         <header className="ebook-result-intro">
           <p>Seu resultado é um ponto de partida</p>
           <h2>Transforme essa leitura em refeições que acolhem a sua mente.</h2>
-          <span>O Sabores do Meu Ritmo foi criado para quem quer sair do improviso, ter mais regularidade e construir uma relação mais gentil com a comida — especialmente nos dias em que a ansiedade acelera tudo.</span>
+          <span>O Sabores do Meu Ritmo foi criado para quem quer sair do improviso, ter mais regularidade e construir uma relação mais gentil com a comida, especialmente nos dias em que a ansiedade acelera tudo.</span>
         </header>
         {selection.requiresChoice && (
           <fieldset className="ebook-choice">

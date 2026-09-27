@@ -53,7 +53,7 @@ export function EbookSalesScreen() {
         <div className="shell ebook-sales-hero-grid">
           <div className="ebook-sales-hero-copy">
             <h1>Sua rotina alimentar pode ser um lugar de paz.</h1>
-            <p>Três e-books com receitas práticas e inspiração do Ayurveda para você deixar o improviso, a culpa e a rigidez de lado — e voltar a comer de um jeito mais possível para a sua vida.</p>
+            <p>Três e-books com receitas práticas e inspiração do Ayurveda para você deixar o improviso, a culpa e a rigidez de lado e voltar a comer de um jeito mais possível para a sua vida.</p>
             <div className="ebook-sales-promo" aria-label="Oferta promocional"><span>Preço promocional por tempo limitado</span><strong>5 x de R$ 3,58</strong><small>ou R$ 17,90 à vista · parcelamento sem juros*</small><p>Por menos de R$ 1 por dia, você pode transformar sua rotina através da alimentação nos próximos 7 dias.</p></div>
             <a className="ebook-sales-primary-action" href="#edicoes">Ver as edições e escolher a minha <ArrowRight aria-hidden="true" size={21} /></a>
             <small>Conteúdo digital • acesso após a confirmação da compra</small>
@@ -81,7 +81,7 @@ export function EbookSalesScreen() {
         <div className="ebook-sales-reframe-image"><img src="/ads-teste-dosha-gratuito-v2.png" alt="Larissa Petian em ambiente acolhedor" /></div>
         <div>
           <h2 id="reframe-title">Um caminho para quem quer se alimentar sem viver em guerra com o próprio corpo.</h2>
-          <p>Sabores do Meu Ritmo não é uma dieta da moda e não exige perfeição. É uma coleção de guias práticos para ajudar você a montar refeições, planejar a semana e criar pequenas pausas de presença — mesmo quando a mente está acelerada.</p>
+          <p>Sabores do Meu Ritmo não é uma dieta da moda e não exige perfeição. É uma coleção de guias práticos para ajudar você a montar refeições, planejar a semana e criar pequenas pausas de presença, mesmo quando a mente está acelerada.</p>
           <p>Você não precisa caber em um padrão para merecer cuidado. Precisa de escolhas que façam sentido na sua cozinha, na sua agenda e no seu corpo real.</p>
         </div>
       </section>

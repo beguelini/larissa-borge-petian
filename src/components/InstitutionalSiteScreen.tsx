@@ -68,7 +68,7 @@ export function InstitutionalSiteScreen() {
           <div className="institutional-hero-copy">
             <h1>Ayurveda para a vida real.</h1>
             <p>
-              Um olhar atento para o que o seu corpo e a sua rotina estão pedindo — com escolhas
+              Um olhar atento para o que o seu corpo e a sua rotina estão pedindo, com escolhas
               possíveis, sem fórmulas prontas e sem exigir uma vida perfeita.
             </p>
             <div className="institutional-hero-actions">

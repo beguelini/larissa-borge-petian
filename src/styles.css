@@ -230,7 +230,7 @@ button {
   .registration-chart svg { height: 150px; }
 }
 
-/* Analytics dashboard — matched to the approved reference composition. */
+/* Analytics dashboard, matched to the approved reference composition. */
 .reference-dashboard {
   min-height: 100vh;
   background: #fffefc;

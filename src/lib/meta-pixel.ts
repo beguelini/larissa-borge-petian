@@ -23,7 +23,7 @@ export function trackMetaEbookCheckout(edition: string) {
   if (typeof window === 'undefined') return
   window.fbq?.('track', 'InitiateCheckout', {
     content_ids: [`sabores-meu-ritmo-${edition}`],
-    content_name: `Sabores do Meu Ritmo — Edição ${edition.charAt(0).toUpperCase()}${edition.slice(1)}`,
+    content_name: `Sabores do Meu Ritmo: Edição ${edition.charAt(0).toUpperCase()}${edition.slice(1)}`,
     content_type: 'product',
     currency: 'BRL',
     value: 17.9,

@@ -77,7 +77,7 @@ export function EnrollmentScreen() {
           <div>
             <p className="enrollment-kicker">Talvez você também sinta</p>
             <h2>A vida real nem sempre vem no ritmo que a gente gostaria.</h2>
-          <p>Entre tarefas, expectativas e muitas responsabilidades, a mente pode ficar acelerada e o corpo entrar em modo de sobrevivência. Meu Ritmo nasce como um convite para voltar a se escutar — sem dietas rígidas, culpa ou a exigência de dar conta de tudo.</p>
+          <p>Entre tarefas, expectativas e muitas responsabilidades, a mente pode ficar acelerada e o corpo entrar em modo de sobrevivência. Meu Ritmo nasce como um convite para voltar a se escutar, sem dietas rígidas, culpa ou a exigência de dar conta de tudo.</p>
           </div>
           <p className="enrollment-quote">Não se trata de fazer mais. Trata-se de fazer diferente, com mais presença.</p>
         </div>
@@ -87,7 +87,7 @@ export function EnrollmentScreen() {
         <div className="enrollment-authority-copy">
           <p className="enrollment-kicker">Prazer, eu sou a Larissa</p>
           <h2 id="larissa-title">Um caminho de cuidado que conversa com a sua vida real.</h2>
-          <p>Sou professora de Hatha e Vinyasa Yoga e Terapeuta Ayurveda. Estou disponível para acompanhar mulheres que desejam compreender os próprios padrões e criar escolhas mais sustentáveis para alimentação, movimento e rotina — com presença, gentileza e autonomia.</p>
+          <p>Sou professora de Hatha e Vinyasa Yoga e Terapeuta Ayurveda. Estou disponível para acompanhar mulheres que desejam compreender os próprios padrões e criar escolhas mais sustentáveis para alimentação, movimento e rotina, com presença, gentileza e autonomia.</p>
           <p className="enrollment-authority-signature">Larissa Petian</p>
         </div>
         <figure className="enrollment-authority-image">
@@ -100,7 +100,7 @@ export function EnrollmentScreen() {
           <div className="enrollment-live-intro">
             <p className="enrollment-kicker">Acompanhamento que aproxima</p>
             <h2 id="live-support-title">Você não precisa atravessar essa mudança sozinha.</h2>
-            <p>Meu Ritmo não é apenas uma biblioteca de conteúdos. É um espaço para ser vista, compreendida e acompanhada enquanto transforma pequenas escolhas em uma rotina que realmente cabe na sua vida — especialmente nos dias em que a mente parece não desligar.</p>
+            <p>Meu Ritmo não é apenas uma biblioteca de conteúdos. É um espaço para ser vista, compreendida e acompanhada enquanto transforma pequenas escolhas em uma rotina que realmente cabe na sua vida, especialmente nos dias em que a mente parece não desligar.</p>
           </div>
           <div className="enrollment-live-details">
             <article>
