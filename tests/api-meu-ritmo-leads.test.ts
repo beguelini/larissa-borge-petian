@@ -32,7 +32,7 @@ describe('POST /api/meu-ritmo-leads', () => {
       whatsapp: '(17) 99130-3920',
       privacyConsent: true,
       communicationsConsent: true,
-      source: { path: '/meu-ritmo', utmSource: 'instagram', unexpected: 'discard' },
+      source: { path: '/meu-ritmo', utmSource: 'ig', utmMedium: 'paid', utmCampaign: 'meu-ritmo', utmContent: 'Vídeo rotina', utmPlacement: 'Instagram Reels', unexpected: 'discard' },
     })
 
     expect(result.status).toBe(201)
@@ -44,7 +44,7 @@ describe('POST /api/meu-ritmo-leads', () => {
       whatsapp: '5517991303920',
       privacy_consent: true,
       communications_consent: true,
-      source: { path: '/meu-ritmo', utmSource: 'instagram' },
+      source: { path: '/meu-ritmo', utmSource: 'ig', utmMedium: 'paid', utmCampaign: 'meu-ritmo', utmContent: 'Vídeo rotina', utmPlacement: 'Instagram Reels' },
     })
     expect(JSON.parse(String(init?.body)).source).not.toHaveProperty('unexpected')
   })

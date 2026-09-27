@@ -311,7 +311,8 @@ button {
 .mr-status-banner { display: flex; gap: 13px; align-items: flex-start; margin-top: 20px; padding: 16px 19px; border: 1px solid #e9d8b6; border-radius: 8px; color: #72592d; background: #fbf5e8; line-height: 1.5; }
 .mr-status-banner > svg { flex: 0 0 auto; margin-top: 2px; }
 .mr-status-banner strong { display: block; margin-bottom: 2px; color: #5a4522; }
-.mr-metrics { margin-top: 20px; }
+.mr-metrics { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 20px; }
+@media (max-width: 980px) { .mr-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .mr-finance-metrics { margin-top: 14px; }
 .mr-insights-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr); gap: 20px; margin-top: 20px; }
 .mr-insights-grid .reference-card { min-height: 310px; }
@@ -327,6 +328,22 @@ button {
 .mr-source-row strong { overflow: hidden; color: #324b3c; font-size: .91rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .mr-source-row small { color: #7a847b; font-size: .76rem; }
 .mr-source-row b { color: #557444; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+.mr-source-results { justify-items: end; gap: 1px !important; }
+.mr-source-results small { color: #557444; font-size: .72rem; font-weight: 650; }
+.mr-attribution-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 3px; }
+.mr-platform-tag, .mr-paid-tag, .mr-medium-tag { min-height: 24px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; font-size: .68rem; font-weight: 650; line-height: 1; white-space: nowrap; }
+.mr-platform-tag { border: 1px solid #e5e3dc; background: #f8f7f2; color: #445347; }
+.mr-platform-tag svg { width: 14px; height: 14px; flex: none; }
+.mr-platform-tag.is-instagram { border-color: #ead5e2; background: #fff8fc; color: #a33c76; }
+.mr-platform-tag.is-facebook { border-color: #d8e4fb; background: #f5f9ff; color: #1767bf; }
+.mr-platform-tag.is-generic { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.mr-platform-tag.is-instagram svg { color: #bd4388; }
+.mr-platform-tag.is-facebook svg { color: #1877f2; }
+.mr-paid-tag { background: #edf1e7; color: #526840; }
+.mr-medium-tag { background: #f2efe8; color: #727465; }
+.mr-lead-attribution { min-width: 190px; display: grid; justify-items: start; gap: 4px; }
+.mr-lead-attribution .mr-attribution-tags { margin-bottom: 0; }
+.mr-lead-attribution small { color: #78827a; font-size: .68rem; line-height: 1.4; }
 .mr-data-note { max-width: 950px; margin: 19px 0 0; color: #7b847d; font-size: .8rem; line-height: 1.5; }
 .mr-date-panel { width: min(100%, 850px); padding: 19px 21px; border: 1px solid #e4e0d7; border-radius: 12px; background: linear-gradient(140deg, #fffefa, #f7f4ed); box-shadow: 0 8px 24px rgba(56, 43, 29, .045); }
 .mr-date-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #264635; }
