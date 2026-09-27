@@ -63,7 +63,7 @@ function requestAnalytics(range: DateRange) {
 
 function formatRange(range: DateRange) {
   const format = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  return `${format.format(new Date(`${range.from}T12:00:00`))} – ${format.format(new Date(`${range.to}T12:00:00`))}`
+  return `${format.format(new Date(`${range.from}T12:00:00`))} até ${format.format(new Date(`${range.to}T12:00:00`))}`
 }
 
 function emptyAnalytics(): Analytics {
@@ -87,7 +87,7 @@ export function AnalyticsScreen() {
   const maxCount = Math.max(...Object.values(data.doshas), 1)
   const maxDaily = Math.max(...data.registrationsByDay.map(({ count }) => count), 3)
   const lastDateCount = data.registrationsByDay.at(-1)?.count ?? 0
-  const dominantLabel = data.dominantDosha ? doshaLabel[data.dominantDosha] : '—'
+  const dominantLabel = data.dominantDosha ? doshaLabel[data.dominantDosha] : 'Sem perfil'
   const graph = useMemo(() => chartPath(data.registrationsByDay, maxDaily), [data.registrationsByDay, maxDaily])
 
   return <div className="reference-dashboard" id="painel"><DashboardSidebar active="panel" /><main className="reference-main">
@@ -95,7 +95,7 @@ export function AnalyticsScreen() {
     {error ? <div className="reference-error" role="alert">{error}</div> : <>
       <section className="reference-metrics" aria-label="Indicadores dos cadastros">
         <Metric icon={<Users />} label="Cadastros" value={data.total} detail="Total no período" />
-        <Metric icon={<CalendarDays />} label="Fim do período" value={lastDateCount} detail={formatRange(range).split(' – ')[1]} />
+        <Metric icon={<CalendarDays />} label="Fim do período" value={lastDateCount} detail={formatRange(range).split(' até ')[1]} />
         <Metric icon={<ShieldCheck />} label={<>Consentimento<br />de marketing</>} value={`${data.marketingConsentRate}%`} detail="Dos cadastros" />
         <Metric icon={<Leaf />} label="Perfil de doshas" value={dominantLabel} detail={data.total ? 'Predominante' : 'Aguardando cadastros'} accent />
       </section>

@@ -1,4 +1,4 @@
-# Descubra seu dosha — Larissa Petian
+# Descubra seu dosha: Larissa Petian
 
 Funil mobile-first de descoberta educativa de doshas para a Larissa Petian. A experiência conduz a visitante por 15 perguntas, calcula a tendência predominante, registra o lead com consentimento LGPD e apresenta um ritual inicial antes da oferta do programa **Ritmo Essencial**.
 
