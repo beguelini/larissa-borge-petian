@@ -353,7 +353,7 @@ button {
 .mr-leads-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #314339; font-size: .77rem; }
 .mr-leads-search input:focus-visible { outline: 0; }
 .mr-leads-table-wrap { overflow: auto; border-top: 1px solid #ece9e2; }
-.mr-leads-table-wrap table { width: 100%; min-width: 1040px; border-collapse: collapse; text-align: left; }
+.mr-leads-table-wrap table { width: 100%; min-width: 1120px; border-collapse: collapse; text-align: left; }
 .mr-leads-table-wrap th { padding: 12px 14px; color: #78827a; font-size: .65rem; font-weight: 700; letter-spacing: .045em; text-transform: uppercase; white-space: nowrap; }
 .mr-leads-table-wrap td { padding: 12px 14px; border-top: 1px solid #f0eee9; color: #59665d; font-size: .76rem; vertical-align: middle; }
 .mr-leads-table-wrap td strong { display: block; color: #2e4336; font-size: .78rem; font-weight: 650; }

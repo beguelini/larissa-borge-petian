@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { BadgePercent, CalendarDays, CheckCircle2, Clock3, CreditCard, RefreshCw, Search, ShoppingBag, Users } from 'lucide-react'
+import { BadgePercent, CalendarDays, CheckCircle2, Clock3, CreditCard, RefreshCw, Search, ShoppingBag, Trash2, Users } from 'lucide-react'
 import { DashboardSidebar } from './DashboardSidebar'
 import { FooterLogo } from './FooterLogo'
 
 type DateRange = { from: string; to: string }
 type DatePreset = 'today' | 'yesterday' | 'thisWeek' | 'last7Days' | 'thisMonth' | 'lastMonth' | 'last30Days' | 'custom'
-type LaunchLead = { name: string; email: string; whatsapp: string; createdAt: string; privacyConsent: boolean; communicationsConsent: boolean; source: string; medium: string; campaign: string }
+type LaunchLead = { id: string; name: string; email: string; whatsapp: string; createdAt: string; privacyConsent: boolean; communicationsConsent: boolean; source: string; medium: string; campaign: string }
 type Performance = {
   range: DateRange
   leads: number
@@ -83,6 +83,7 @@ export function MeuRitmoPerformanceScreen() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [deletingId, setDeletingId] = useState('')
 
   function load(nextRange = range) {
     setLoading(true)
@@ -114,6 +115,22 @@ export function MeuRitmoPerformanceScreen() {
     setPreset(nextPreset)
     setRange(nextRange)
     load(nextRange)
+  }
+
+  async function removeLead(lead: LaunchLead) {
+    if (!window.confirm(`Excluir permanentemente o lead de ${lead.name}? Esta ação não pode ser desfeita.`)) return
+    setDeletingId(lead.id)
+    setError('')
+    try {
+      const response = await fetch(`/api/meu-ritmo-performance?id=${encodeURIComponent(lead.id)}`, { method: 'DELETE' })
+      if (response.status === 401) { window.location.assign('/login'); return }
+      if (!response.ok) throw new Error('delete')
+      load()
+    } catch {
+      setError('Não foi possível excluir o lead agora.')
+    } finally {
+      setDeletingId('')
+    }
   }
 
   const presets: { id: Exclude<DatePreset, 'custom'>; label: string }[] = [
@@ -149,7 +166,7 @@ export function MeuRitmoPerformanceScreen() {
       </section>
       <section className="mr-leads-card" aria-labelledby="mr-leads-title">
         <div className="mr-leads-heading"><div><p className="mr-kicker">Base de captação</p><h2 id="mr-leads-title">Leads do Meu Ritmo <span>{result.leads}</span></h2><p>Dados informados no formulário entre {formatRange(range)}.</p></div><label className="mr-leads-search"><Search size={17} aria-hidden="true" /><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar nome, e-mail ou WhatsApp" aria-label="Buscar leads" /></label></div>
-        <div className="mr-leads-table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Cadastro</th><th>Origem</th><th>Privacidade</th><th>Informativos</th></tr></thead><tbody>{filteredLeads.map((lead) => <tr key={`${lead.createdAt}-${lead.email}`}><td><strong>{lead.name}</strong></td><td><a href={`mailto:${lead.email}`}>{lead.email}</a></td><td><a className="mr-whatsapp-link" href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label={`Conversar com ${lead.name} pelo WhatsApp`} title={`Conversar com ${lead.name} pelo WhatsApp`}><WhatsAppIcon /> <span>{lead.whatsapp}</span></a></td><td>{new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(lead.createdAt))}</td><td><strong>{lead.campaign}</strong><small>{lead.source} · {lead.medium}</small></td><td>{lead.privacyConsent ? 'Aceito' : 'Não registrado'}</td><td>{lead.communicationsConsent ? 'Sim' : 'Não'}</td></tr>)}{filteredLeads.length === 0 && <tr><td colSpan={7} className="mr-leads-empty">{result.leadList.length ? 'Nenhum lead corresponde à busca.' : 'Ainda não há leads neste período.'}</td></tr>}</tbody></table></div>
+        <div className="mr-leads-table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Cadastro</th><th>Origem</th><th>Privacidade</th><th>Informativos</th><th>Ação</th></tr></thead><tbody>{filteredLeads.map((lead) => <tr key={lead.id}><td><strong>{lead.name}</strong></td><td><a href={`mailto:${lead.email}`}>{lead.email}</a></td><td><a className="mr-whatsapp-link" href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label={`Conversar com ${lead.name} pelo WhatsApp`} title={`Conversar com ${lead.name} pelo WhatsApp`}><WhatsAppIcon /> <span>{lead.whatsapp}</span></a></td><td>{new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(lead.createdAt))}</td><td><strong>{lead.campaign}</strong><small>{lead.source} · {lead.medium}</small></td><td>{lead.privacyConsent ? 'Aceito' : 'Não registrado'}</td><td>{lead.communicationsConsent ? 'Sim' : 'Não'}</td><td><button className="registration-delete" type="button" aria-label={`Excluir lead de ${lead.name}`} onClick={() => void removeLead(lead)} disabled={loading || deletingId === lead.id}><Trash2 size={16} />{deletingId === lead.id ? 'Excluindo…' : 'Excluir'}</button></td></tr>)}{filteredLeads.length === 0 && <tr><td colSpan={8} className="mr-leads-empty">{result.leadList.length ? 'Nenhum lead corresponde à busca.' : 'Ainda não há leads neste período.'}</td></tr>}</tbody></table></div>
         <div className="mr-leads-footer"><span>{filteredLeads.length} de {result.leads} cadastros</span><button type="button" onClick={() => load()} disabled={loading}><RefreshCw size={15} aria-hidden="true" className={loading ? 'mr-refreshing' : ''} /> Atualizar lista</button></div>
       </section>
       <p className="mr-data-note">A atribuição de venda usa correspondência exata de e-mail entre o cadastro e a compra. Os indicadores de vendas consideram pedidos aprovados depois da inscrição e deixam reembolsos e chargebacks fora da conversão ativa. O repasse só é exibido quando informado pela Hotmart.</p>
