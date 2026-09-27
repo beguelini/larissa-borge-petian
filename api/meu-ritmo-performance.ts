@@ -23,6 +23,7 @@ type HotmartEvent = {
   event_created_at: string | null
 }
 type DateRange = { from: string; to: string }
+type SocialPlatform = 'instagram' | 'facebook' | null
 
 function localDay(value: string) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value))
@@ -44,6 +45,23 @@ function textValue(value: unknown, fallback: string) {
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : fallback
 }
 
+function optionalTextValue(value: unknown) {
+  return typeof value === 'string' ? value.trim().slice(0, 120) : ''
+}
+
+function socialPlatform(value: unknown, referrer: unknown): SocialPlatform {
+  const source = typeof value === 'string' ? value.trim().toLocaleLowerCase('pt-BR') : ''
+  const referredFrom = typeof referrer === 'string' ? referrer.toLocaleLowerCase('pt-BR') : ''
+  if (source === 'ig' || source.includes('instagram') || referredFrom.includes('instagram.com')) return 'instagram'
+  if (source === 'fb' || source.includes('facebook') || referredFrom.includes('facebook.com')) return 'facebook'
+  return null
+}
+
+function isPaidMedium(value: unknown) {
+  if (typeof value !== 'string') return false
+  return /paid|cpc|ppc|cpm|cpa|cpv|cpi|ads|advertising/i.test(value)
+}
+
 function isReversal(event: HotmartEvent) {
   return event.event_type === 'PURCHASE_REFUNDED' || event.event_type === 'PURCHASE_CHARGEBACK'
 }
@@ -59,7 +77,7 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
 
   const leadsByEmail = new Map<string, Lead[]>()
   const registrationsByDay = new Map<string, number>()
-  const attribution = new Map<string, { source: string; medium: string; campaign: string; leads: number }>()
+  const attribution = new Map<string, { source: string; medium: string; campaign: string; placement: string; ad: string; platform: SocialPlatform; paid: boolean; leads: number }>()
   leads.forEach((lead) => {
     const email = lead.email.trim().toLocaleLowerCase('pt-BR')
     if (!email) return
@@ -69,8 +87,12 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
     const source = textValue(lead.source?.utmSource, 'Direto ou não informado')
     const medium = textValue(lead.source?.utmMedium, 'Sem mídia')
     const campaign = textValue(lead.source?.utmCampaign, 'Sem campanha')
-    const key = `${source}\u0000${medium}\u0000${campaign}`
-    const row = attribution.get(key) ?? { source, medium, campaign, leads: 0 }
+    const placement = optionalTextValue(lead.source?.utmPlacement)
+    const ad = optionalTextValue(lead.source?.utmContent)
+    const platform = socialPlatform(lead.source?.utmSource, lead.source?.referrer)
+    const paid = isPaidMedium(lead.source?.utmMedium)
+    const key = `${source}\u0000${medium}\u0000${campaign}\u0000${placement}\u0000${ad}`
+    const row = attribution.get(key) ?? { source, medium, campaign, placement, ad, platform, paid, leads: 0 }
     row.leads += 1
     attribution.set(key, row)
   })
@@ -118,9 +140,12 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
   }
 
   const uniqueLeads = cohortEmails.size
+  const paidTrafficLeads = leads.filter((lead) => isPaidMedium(lead.source?.utmMedium)).length
   return {
     range,
     leads: leads.length,
+    paidTrafficLeads,
+    paidTrafficPercent: leads.length ? Math.round((paidTrafficLeads / leads.length) * 1000) / 10 : 0,
     uniqueLeads,
     convertedLeads: convertedEmails.size,
     conversionRate: uniqueLeads ? Math.round((convertedEmails.size / uniqueLeads) * 1000) / 10 : 0,
@@ -138,9 +163,13 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
       createdAt: lead.created_at,
       privacyConsent: lead.privacy_consent === true,
       communicationsConsent: lead.communications_consent === true,
+      platform: socialPlatform(lead.source?.utmSource, lead.source?.referrer),
+      paid: isPaidMedium(lead.source?.utmMedium),
       source: textValue(lead.source?.utmSource, 'Direto ou não informado'),
       medium: textValue(lead.source?.utmMedium, 'Sem mídia'),
       campaign: textValue(lead.source?.utmCampaign, 'Sem campanha'),
+      placement: optionalTextValue(lead.source?.utmPlacement),
+      ad: optionalTextValue(lead.source?.utmContent),
     })),
     registrationsByDay: Array.from({ length: Math.round((new Date(`${range.to}T12:00:00Z`).getTime() - new Date(`${range.from}T12:00:00Z`).getTime()) / 86_400_000) + 1 }, (_, index) => {
       const date = new Date(`${range.from}T12:00:00Z`)
@@ -148,7 +177,10 @@ export function summarizeMeuRitmoPerformance(leads: Lead[], events: HotmartEvent
       const day = date.toISOString().slice(0, 10)
       return { date: day, count: registrationsByDay.get(day) ?? 0 }
     }),
-    attribution: [...attribution.values()].sort((a, b) => b.leads - a.leads).slice(0, 20),
+    attribution: [...attribution.values()]
+      .map((row) => ({ ...row, percent: leads.length ? Math.round((row.leads / leads.length) * 1000) / 10 : 0 }))
+      .sort((a, b) => b.leads - a.leads)
+      .slice(0, 20),
   }
 }
 

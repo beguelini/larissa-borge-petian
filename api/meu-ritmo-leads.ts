@@ -36,7 +36,7 @@ function source(value: unknown) {
   if (!isRecord(value)) return {}
   return Object.fromEntries(
     Object.entries(value)
-      .filter(([key, item]) => ['path', 'referrer', 'utmSource', 'utmMedium', 'utmCampaign'].includes(key) && (typeof item === 'string' || item === null))
+      .filter(([key, item]) => ['path', 'referrer', 'utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmPlacement'].includes(key) && (typeof item === 'string' || item === null))
       .map(([key, item]) => [key, typeof item === 'string' ? item.slice(0, 500) : null]),
   )
 }

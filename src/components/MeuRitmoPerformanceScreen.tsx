@@ -5,10 +5,14 @@ import { FooterLogo } from './FooterLogo'
 
 type DateRange = { from: string; to: string }
 type DatePreset = 'today' | 'yesterday' | 'thisWeek' | 'last7Days' | 'thisMonth' | 'lastMonth' | 'last30Days' | 'custom'
-type LaunchLead = { id: string; name: string; email: string; whatsapp: string; createdAt: string; privacyConsent: boolean; communicationsConsent: boolean; source: string; medium: string; campaign: string }
+type SocialPlatform = 'instagram' | 'facebook' | null
+type LaunchLead = { id: string; name: string; email: string; whatsapp: string; createdAt: string; privacyConsent: boolean; communicationsConsent: boolean; platform: SocialPlatform; paid: boolean; source: string; medium: string; campaign: string; placement: string; ad: string }
+type Attribution = { source: string; medium: string; campaign: string; placement: string; ad: string; platform: SocialPlatform; paid: boolean; leads: number; percent: number }
 type Performance = {
   range: DateRange
   leads: number
+  paidTrafficLeads: number
+  paidTrafficPercent: number
   uniqueLeads: number
   convertedLeads: number
   conversionRate: number
@@ -20,7 +24,7 @@ type Performance = {
   averageDaysToSale: number | null
   leadList: LaunchLead[]
   registrationsByDay: { date: string; count: number }[]
-  attribution: { source: string; medium: string; campaign: string; leads: number }[]
+  attribution: Attribution[]
 }
 
 function localDate(now = new Date()) {
@@ -58,6 +62,18 @@ function formatMoney(value: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
 }
 
+function formatPercent(value: number) {
+  return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(value)}%`
+}
+
+function formatPlacement(value: string) {
+  const normalized = value.toLocaleLowerCase('pt-BR')
+  if (normalized.includes('reel')) return 'Reels'
+  if (normalized.includes('stor')) return 'Stories'
+  if (normalized.includes('feed')) return 'Feed'
+  return value
+}
+
 function formatRange(range: DateRange) {
   const format = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
   return `${format.format(new Date(`${range.from}T12:00:00`))} a ${format.format(new Date(`${range.to}T12:00:00`))}`
@@ -73,7 +89,7 @@ function requestPerformance(range: DateRange) {
 }
 
 function emptyPerformance(range: DateRange): Performance {
-  return { range, leads: 0, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, leadList: [], registrationsByDay: [], attribution: [] }
+  return { range, leads: 0, paidTrafficLeads: 0, paidTrafficPercent: 0, uniqueLeads: 0, convertedLeads: 0, conversionRate: 0, orders: 0, grossRevenue: 0, netRevenue: null, refunds: 0, chargebacks: 0, averageDaysToSale: null, leadList: [], registrationsByDay: [], attribution: [] }
 }
 
 export function MeuRitmoPerformanceScreen() {
@@ -153,6 +169,7 @@ export function MeuRitmoPerformanceScreen() {
         <Metric icon={<CheckCircle2 />} label="Leads convertidos" value={result.convertedLeads} detail="Compra aprovada após cadastro" />
         <Metric icon={<BadgePercent />} label="Conversão" value={`${result.conversionRate}%`} detail="Da base única de leads" accent />
         <Metric icon={<ShoppingBag />} label="Pedidos ativos" value={result.orders} detail="Comunidade Meu Ritmo" />
+        <Metric icon={<BadgePercent />} label="Tráfego pago" value={formatPercent(result.paidTrafficPercent)} detail={`${result.paidTrafficLeads} de ${result.leads} leads no período`} />
       </section>
       <section className="reference-metrics mr-finance-metrics" aria-label="Indicadores financeiros da comunidade">
         <Metric icon={<CreditCard />} label="Receita bruta" value={formatMoney(result.grossRevenue)} detail="Pedidos aprovados ativos" />
@@ -162,11 +179,11 @@ export function MeuRitmoPerformanceScreen() {
       </section>
       <section className="mr-insights-grid">
         <article className="reference-card mr-daily-card"><h2>Captação por dia</h2><p>Cada barra representa um dia. Passe o cursor para ver a data e a quantidade.</p>{chart.length ? <div className="mr-bar-chart" role="img" aria-label="Gráfico de leads captados por dia">{chart.map(({ date, count, height, showDate }) => <div className={`mr-bar-column ${showDate ? 'has-date-label' : ''}`} key={date} title={`${new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`))}: ${count} ${count === 1 ? 'lead' : 'leads'}`}><span>{count || ''}</span><i style={{ height: `${height}%` }} /><small aria-hidden={!showDate}>{showDate ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: chart.length > 10 ? '2-digit' : undefined, timeZone: 'UTC' }).format(new Date(`${date}T12:00:00Z`)) : ''}</small></div>)}</div> : <p className="reference-empty">Os cadastros aparecerão aqui.</p>}</article>
-        <article className="reference-card mr-sources-card"><h2>Origem dos leads</h2><p>Campanha, fonte e mídia registrados no formulário.</p>{result.attribution.length ? <div className="mr-source-list">{result.attribution.map((source, index) => <div className="mr-source-row" key={`${source.source}-${source.medium}-${source.campaign}-${index}`}><span><strong>{source.campaign}</strong><small>{source.source} · {source.medium}</small></span><b>{source.leads}</b></div>)}</div> : <p className="reference-empty">Ainda não há parâmetros de campanha nos cadastros deste período.</p>}</article>
+        <article className="reference-card mr-sources-card"><h2>Origem dos leads</h2><p>Plataforma, tráfego, posicionamento e anúncio quando informados no link.</p>{result.attribution.length ? <div className="mr-source-list">{result.attribution.map((source, index) => <div className="mr-source-row" key={`${source.source}-${source.medium}-${source.campaign}-${source.placement}-${source.ad}-${index}`}><span><AttributionTags platform={source.platform} source={source.source} medium={source.medium} paid={source.paid} /><strong>{source.campaign}</strong>{source.placement && <small>Posicionamento: {formatPlacement(source.placement)}</small>}{source.ad && <small>Anúncio: {source.ad}</small>}</span><span className="mr-source-results"><b>{source.leads}</b><small>{formatPercent(source.percent)}</small></span></div>)}</div> : <p className="reference-empty">Ainda não há parâmetros de campanha nos cadastros deste período.</p>}</article>
       </section>
       <section className="mr-leads-card" aria-labelledby="mr-leads-title">
         <div className="mr-leads-heading"><div><p className="mr-kicker">Base de captação</p><h2 id="mr-leads-title">Leads do Meu Ritmo <span>{result.leads}</span></h2><p>Dados informados no formulário entre {formatRange(range)}.</p></div><label className="mr-leads-search"><Search size={17} aria-hidden="true" /><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar nome, e-mail ou WhatsApp" aria-label="Buscar leads" /></label></div>
-        <div className="mr-leads-table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Cadastro</th><th>Origem</th><th>Privacidade</th><th>Informativos</th><th>Ação</th></tr></thead><tbody>{filteredLeads.map((lead) => <tr key={lead.id}><td><strong>{lead.name}</strong></td><td><a href={`mailto:${lead.email}`}>{lead.email}</a></td><td><a className="mr-whatsapp-link" href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label={`Conversar com ${lead.name} pelo WhatsApp`} title={`Conversar com ${lead.name} pelo WhatsApp`}><WhatsAppIcon /> <span>{lead.whatsapp}</span></a></td><td>{new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(lead.createdAt))}</td><td><strong>{lead.campaign}</strong><small>{lead.source} · {lead.medium}</small></td><td>{lead.privacyConsent ? 'Aceito' : 'Não registrado'}</td><td>{lead.communicationsConsent ? 'Sim' : 'Não'}</td><td><button className="registration-delete" type="button" aria-label={`Excluir lead de ${lead.name}`} onClick={() => void removeLead(lead)} disabled={loading || deletingId === lead.id}><Trash2 size={16} />{deletingId === lead.id ? 'Excluindo…' : 'Excluir'}</button></td></tr>)}{filteredLeads.length === 0 && <tr><td colSpan={8} className="mr-leads-empty">{result.leadList.length ? 'Nenhum lead corresponde à busca.' : 'Ainda não há leads neste período.'}</td></tr>}</tbody></table></div>
+        <div className="mr-leads-table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Cadastro</th><th>Origem</th><th>Privacidade</th><th>Informativos</th><th>Ação</th></tr></thead><tbody>{filteredLeads.map((lead) => <tr key={lead.id}><td><strong>{lead.name}</strong></td><td><a href={`mailto:${lead.email}`}>{lead.email}</a></td><td><a className="mr-whatsapp-link" href={`https://wa.me/${lead.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" aria-label={`Conversar com ${lead.name} pelo WhatsApp`} title={`Conversar com ${lead.name} pelo WhatsApp`}><WhatsAppIcon /> <span>{lead.whatsapp}</span></a></td><td>{new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(lead.createdAt))}</td><td><div className="mr-lead-attribution"><AttributionTags platform={lead.platform} source={lead.source} medium={lead.medium} paid={lead.paid} /><strong>{lead.campaign}</strong>{lead.placement && <small>Posicionamento: {formatPlacement(lead.placement)}</small>}{lead.ad && <small>Anúncio: {lead.ad}</small>}</div></td><td>{lead.privacyConsent ? 'Aceito' : 'Não registrado'}</td><td>{lead.communicationsConsent ? 'Sim' : 'Não'}</td><td><button className="registration-delete" type="button" aria-label={`Excluir lead de ${lead.name}`} onClick={() => void removeLead(lead)} disabled={loading || deletingId === lead.id}><Trash2 size={16} />{deletingId === lead.id ? 'Excluindo…' : 'Excluir'}</button></td></tr>)}{filteredLeads.length === 0 && <tr><td colSpan={8} className="mr-leads-empty">{result.leadList.length ? 'Nenhum lead corresponde à busca.' : 'Ainda não há leads neste período.'}</td></tr>}</tbody></table></div>
         <div className="mr-leads-footer"><span>{filteredLeads.length} de {result.leads} cadastros</span><button type="button" onClick={() => load()} disabled={loading}><RefreshCw size={15} aria-hidden="true" className={loading ? 'mr-refreshing' : ''} /> Atualizar lista</button></div>
       </section>
       <p className="mr-data-note">A atribuição de venda usa correspondência exata de e-mail entre o cadastro e a compra. Os indicadores de vendas consideram pedidos aprovados depois da inscrição e deixam reembolsos e chargebacks fora da conversão ativa. O repasse só é exibido quando informado pela Hotmart.</p>
@@ -181,4 +198,16 @@ function Metric({ icon, label, value, detail, accent = false }: { icon: ReactNod
 
 function WhatsAppIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2a9.92 9.92 0 0 0-8.51 15.02L2 22l5.12-1.34A10 10 0 1 0 12.04 2Zm0 18.18a8.17 8.17 0 0 1-4.16-1.13l-.3-.18-3.04.8.81-2.96-.2-.31a8.18 8.18 0 1 1 6.89 3.78Zm4.49-6.13c-.24-.12-1.43-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.29.18-.53.06-.24-.12-1.03-.38-1.96-1.19-.73-.64-1.22-1.43-1.36-1.67-.14-.24-.01-.38.11-.49.11-.1.24-.28.36-.41.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.41-.06-.12-.55-1.32-.75-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.41.06-.63.3-.22.24-.83.81-.83 1.98s.85 2.29.97 2.45c.12.16 1.67 2.55 4.05 3.57.57.25 1.01.4 1.36.5.57.18 1.09.15 1.5.09.46-.07 1.45-.59 1.65-1.14.2-.56.2-1.03.14-1.14-.06-.1-.22-.16-.46-.28Z" /></svg>
+}
+
+function AttributionTags({ platform, source, medium, paid }: { platform: SocialPlatform; source: string; medium: string; paid: boolean }) {
+  return <div className="mr-attribution-tags">
+    {platform ? <span className={`mr-platform-tag is-${platform}`}><PlatformLogo platform={platform} />{platform === 'instagram' ? 'Instagram' : 'Facebook'}</span> : <span className="mr-platform-tag is-generic">{source}</span>}
+    {paid ? <span className="mr-paid-tag">Tráfego pago</span> : medium !== 'Sem mídia' && <span className="mr-medium-tag">{medium}</span>}
+  </div>
+}
+
+function PlatformLogo({ platform }: { platform: Exclude<SocialPlatform, null> }) {
+  if (platform === 'instagram') return <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.3" y="3.3" width="17.4" height="17.4" rx="5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="17.7" cy="6.5" r="1.2" fill="currentColor" /></svg>
+  return <svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M13.3 21v-8h2.8l.4-3.1h-3.2v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.4-.1-2.6-.1-2.6 0-4.4 1.6-4.4 4.5v2.5H6.7V13h2.9v8h3.7Z" /></svg>
 }
