@@ -53,7 +53,7 @@ export function Overview({ entries, plan, trip, openTrip, openLedger }: {
       </div>
 
       <section className="fr-stack fr-small-gap fr-categories">
-        <div className="fr-heading"><h2>Orçamento por categoria</h2></div>
+        <div className="fr-heading"><h2>Orçamento por categoria</h2><button className="fr-link fr-categories-toggle" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? "Mostrar menos" : "Ver todas"}</button></div>
         <div className="fr-glass fr-list">
           {shown.map(([key]) => {
             const cap = plan.caps[key]
@@ -68,7 +68,6 @@ export function Overview({ entries, plan, trip, openTrip, openLedger }: {
             </div>
           })}
         </div>
-        <button className="fr-link fr-categories-toggle" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? 'Mostrar menos' : 'Ver todas as categorias'}</button>
       </section>
     </div>
   </>

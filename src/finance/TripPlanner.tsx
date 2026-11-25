@@ -32,7 +32,7 @@ export function TripPlanner({ trip, entries, busy, onSave, onContribution }: {
     <div className="fr-trip-photo" />
     <div className="fr-columns fr-trip-columns">
       <form className="fr-glass fr-pad fr-stack" onSubmit={save}>
-        <div className="fr-fields">
+        <div className="fr-fields fr-trip-identity">
           <label>Nome da viagem<input maxLength={60} value={values.title} onChange={event => update('title', event.target.value)} required /></label>
           <label>Data de saída<input type="date" min="2000-01-01" max="2099-12-31" value={values.date} onChange={event => update('date', event.target.value)} /></label>
         </div>

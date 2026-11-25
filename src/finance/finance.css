@@ -37,7 +37,7 @@ small { font-size: .83rem; }
 .fr-month button, .fr-icon-button { display: inline-grid; width: 2.75rem; min-height: 2.75rem; place-items: center; border: 0; border-radius: 99px; background: transparent; }
 .fr-month button:hover, .fr-icon-button:hover { background: #e9d5bd70; }
 .fr-month span, .fr-departure { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
-.fr-month span { white-space: nowrap; text-transform: capitalize; font-size: .9rem; }
+.fr-month span { white-space: nowrap; font-size: .9rem; }
 .fr-columns, .fr-stack { display: grid; align-items: start; gap: 1rem; min-width: 0; }
 .fr-small-gap { gap: .65rem; }
 .fr-glass { border: 1px solid var(--line); border-radius: 1.12rem; background: linear-gradient(135deg, #fffcf4af, #f6e7d776); box-shadow: inset 0 1px 0 #fff9ef; }
@@ -128,14 +128,21 @@ input::placeholder { color: #735f50; opacity: 1; }
   .fr-navigation { width: min(calc(100% - 2rem), 39rem); bottom: .8rem; border-radius: 1.1rem; padding: .35rem; }
 }
 @media (max-width: 26rem) {
-  .fr-trip-fields { grid-template-columns: 1fr; }
+  .fr-trip-identity { grid-template-columns: 1fr; }
   .fr-category .fr-heading { gap: .06rem .5rem; }
 }
-.fr-categories-toggle { justify-self: start; }
+.fr-categories-toggle { flex-shrink: 0; }
 @media (max-width: 45.99rem) {
   .fr-overview-main { display: contents; }
   .fr-overview .fr-balance { order: 1; }
   .fr-overview .fr-categories { order: 2; }
   .fr-overview .fr-trip-teaser { order: 3; }
   .fr-overview-due { order: 4; }
+}
+
+@media (max-width: 45.99rem) {
+  .fr-month { margin-bottom: 1.3rem; }
+  .fr-balance { padding-block: .95rem; }
+  .fr-balance-value { margin-bottom: .7rem; }
+  .fr-overview .fr-categories h2 { font-size: clamp(1.2rem, 5vw, 1.5rem); }
 }
